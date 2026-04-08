@@ -108,10 +108,14 @@ SSR、服务端渲染、hydration、
 - "修复登录页验证码不刷新" -> `BUG-20260408-001-login-captcha-refresh`
 - "线上支付回调超时" -> `HOTFIX-20260408-001-payment-callback-timeout`
 
-**创建目录和文件：**
+**创建工作项：**
 
-1. 创建目录 `.feflow/items/{item-id}/`
-2. 创建 `meta.md`，内容如下：
+在创建文件之前，先向用户说明要做什么，例如：
+
+> 我需要在 `.feflow/items/` 下创建工作项文件来记录本次任务。
+> 这是 feflow 的工作流文件，不会影响项目代码。可以吗？
+
+等用户确认后，使用 Write 工具（不要用 Bash mkdir）直接创建 `meta.md` 文件（Write 会自动创建父目录）：
 
 ```markdown
 ---
