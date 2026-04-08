@@ -174,17 +174,17 @@ Six design tenets:
 
 ### V3 Plans
 
-- [ ] Multi-Item dependency and parallel orchestration
-- [ ] Memory auto-decay and archival strategies
-- [ ] Custom flow templates (user-defined Flows)
-- [ ] Dashboard: Item status panoramic view
-- [ ] Evidence chain visualization
+- [x] Multi-Item dependency and parallel orchestration
+- [x] Memory auto-decay and archival strategies
+- [x] Custom flow templates (user-defined Flows)
+- [x] Dashboard: Item status panoramic view
+- [x] Evidence chain visualization
 
 ### Multi-Platform Support
 
-- [ ] Cursor adapter
-- [ ] Windsurf adapter
-- [ ] Other AI coding assistant adapters
+- [x] Cursor adapter
+- [x] Windsurf adapter
+- [x] Other AI coding assistant adapters (generic AGENTS.md)
 
 ## Contributing
 
