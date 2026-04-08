@@ -228,6 +228,34 @@ secondary_types: [{次要类型，若有}]
 - [ ] 影响范围已初步评估
 - [ ] 已确认修复方向（根因定位或临时止血）
 
+### 类型代码与配置名称映射
+
+orchestrator 内部使用大写缩写类型代码，init-config 中的 `require_review_before_coding` 和 `skip_review_types` 等配置使用英文全名。匹配时按以下映射表转换：
+
+| 类型代码 | 配置名称 |
+|----------|----------|
+| `FEAT` | `feature` |
+| `MOD` | `modification` |
+| `BUG` | `bugfix` |
+| `HOTFIX` | `hotfix` |
+| `UI` | `ui_optimize` |
+| `DESIGN` | `design` |
+| `CHANGE` | `change_request` |
+| `REFACTOR` | `refactor` |
+| `TEST` | `test_task` |
+| `CICD` | `cicd` |
+| `DEBT` | `debt` |
+
+### skip_review_types 处理
+
+读取 `init-config.md` 中的 `approval_gates` 配置时，同时检查是否存在 `skip_review_types` 字段。该字段为列表，列出允许跳过编码前评审的任务类型配置名称（如 `hotfix`）。
+
+处理规则：
+1. 从 init-config 读取 `skip_review_types` 列表（若不存在则视为空列表，所有类型均需遵守 `approval_gates` 设定）
+2. 将当前任务的类型代码通过上述映射表转换为配置名称
+3. 若配置名称命中 `skip_review_types` 列表，则该任务跳过编码前评审门禁，直接进入编码阶段
+4. 跳过评审时，在 Item 的 `meta.md` 中记录 `review_skipped: true` 及跳过原因
+
 ---
 
 ## Superpowers 协作机制
