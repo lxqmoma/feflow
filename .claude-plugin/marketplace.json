@@ -1,0 +1,22 @@
+{
+  "name": "feflow-marketplace",
+  "owner": {
+    "name": "lxqmoma",
+    "email": "noreply@github.com"
+  },
+  "metadata": {
+    "description": "Feflow — 前端研发协作引擎",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "feflow",
+      "source": {
+        "source": "directory",
+        "path": "."
+      },
+      "description": "前端研发协作引擎 — 覆盖需求、设计、开发、测试、发布完整闭环的工作流插件",
+      "version": "0.1.0"
+    }
+  ]
+}
