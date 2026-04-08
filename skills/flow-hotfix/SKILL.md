@@ -112,13 +112,13 @@ Hotfix 发布后 24 小时内，必须补全以下三份文档：
 ## 状态流转
 
 ```
-hotfix_triggered
-  → impact_assessed（阶段2完成）
-  → fixing（阶段3进行中）
-  → risk_reviewed（阶段4用户已确认）
-  → verified（阶段5验证通过）
-  → released（阶段6发布完成）
-  → post_recorded（阶段7补录完成）
+created
+  → researching（阶段2：快速影响评估中）
+  → implementing（阶段3：最小修复中）
+  → plan_approved（阶段4：风险已确认）
+  → testing（阶段5：快速验证中）
+  → releasing（阶段6：发布中）
+  → hotfix_post_recorded（阶段7：补录完成）
   → completed
 ```
 

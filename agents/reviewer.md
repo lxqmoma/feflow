@@ -20,7 +20,7 @@ model: inherit
 
 ### 2. 历史错误回归
 
-读取 `.feflow/memory/project/review-failures.md`，检查是否重复犯历史错误。匹配维度：相同模块、相同模式、相同反模式。
+读取 `.feflow/memory/patterns/review-failures.md`，检查是否重复犯历史错误。匹配维度：相同模块、相同模式、相同反模式。
 
 ### 3. 结构性技术债
 

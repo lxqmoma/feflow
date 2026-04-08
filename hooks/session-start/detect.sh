@@ -6,7 +6,7 @@ set -euo pipefail
 
 PROJECT_DIR="${PWD}"
 FEFLOW_DIR="${PROJECT_DIR}/.feflow"
-INIT_CONFIG="${FEFLOW_DIR}/init-config.md"
+INIT_CONFIG="${FEFLOW_DIR}/project/init-config.md"
 
 # 检测 .feflow/ 目录
 if [ -d "${FEFLOW_DIR}" ]; then

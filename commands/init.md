@@ -17,7 +17,7 @@ description: 初始化 feflow 项目工作区
 1. 调用 `feflow:project-init` skill 执行初始化流程
 2. project-init 会完成以下工作：
    - 创建 `.feflow/` 目录结构
-   - 生成 `init-config.md` 初始化配置
+   - 生成 `project/init-config.md` 初始化配置
    - 初始化 `.feflow/memory/` 目录
    - 初始化 `.feflow/items/` 目录
 3. 初始化完成后输出项目状态概览

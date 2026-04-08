@@ -34,7 +34,7 @@ orchestrator 传入当前 Item 完整信息：
 |-------|------|------|----------|
 | 1 | 新坑首次出现，影响有限，不涉及安全/数据 | 仅在 Item 的 `lessons_learned` 留痕，不写记忆库 | Item 文件 |
 | 2 | 相同问题第二次出现 | 写入模块记忆，追加不修改 | `.feflow/memory/modules/{module}.md`；跨模块写入 `patterns/` |
-| 3 | 涉及安全/数据完整性/资金/线上事故/critical 任务 | 升格为不变量，同时在模块记忆添加引用 | `.feflow/memory/project/invariants.md` |
+| 3 | 涉及安全/数据完整性/资金/线上事故/critical 任务 | 升格为不变量，同时在模块记忆添加引用；线上事故同步写入事件记录 | `.feflow/memory/project/invariants.md`；线上事故同步写入 `.feflow/memory/incidents/{ITEM-ID}.md` |
 | 4 | 同一问题出现三次及以上 | 标记 `needs_automation`，给出自动化建议（测试/lint/CI/模板） | 更新对应记忆条目 |
 
 ## 记忆写入格式

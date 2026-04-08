@@ -15,7 +15,7 @@ model: inherit
 ## 技术栈识别
 
 按以下优先级判断后端技术栈：
-1. `.feflow/memory/project/init-config.md` 中的 `backendStack` 配置
+1. `.feflow/project/init-config.md` 中的 `backendStack` 配置
 2. 任务上下文中明确指定的技术栈
 3. 接口文档或代码示例中推断
 

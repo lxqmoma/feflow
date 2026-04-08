@@ -11,7 +11,7 @@ description: 设计落地流程。设计稿还原或前端补设计。当有 Fig
 
 ## 前置条件
 
-- feflow 已初始化（`.feflow/` 目录存在且 `init-config.md` 配置完整）
+- feflow 已初始化（`.feflow/` 目录存在且 `project/init-config.md` 配置完整）
 - orchestrator 已完成任务分类并生成 Item（如 `DESIGN-001`）
 - memory-load 已执行
 
@@ -96,8 +96,8 @@ description: 设计落地流程。设计稿还原或前端补设计。当有 Fig
 ## 状态流转
 
 ```
-# 路径 A: design_parsing → component_breakdown → implementing → design_reviewing → testing → completed
-# 路径 B: input_collecting → proposal_draft → proposal_approved → implementing → design_reviewing → testing → completed
+# 路径 A: created → researching → plan_drafted → implementing → testing → completed
+# 路径 B: created → researching → requirement_drafted → requirement_approved → implementing → testing → completed
 ```
 
 任意阶段可退回前置阶段，退回原因记录在 `implementation-log.md`。

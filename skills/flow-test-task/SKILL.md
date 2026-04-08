@@ -18,6 +18,8 @@ description: 测试任务流程。补测试债、建立 e2e、专项测试验收
 
 ## 阶段 1：测试范围定义
 
+**强制代码调研（不可跳过）**：用 Grep/Glob/Read 搜索相关代码。声称"不存在"时必须展示搜索证据。
+
 1. 明确测试目标：补覆盖 / 建 e2e / 专项验收
 2. 确定目标模块，查询 memory 中的风险标记
 3. **优先级**：高风险无测试 > 高风险低覆盖 > 常规补充
@@ -52,7 +54,7 @@ description: 测试任务流程。补测试债、建立 e2e、专项测试验收
 ## 状态流转
 
 ```
-test_scope_defined → cases_designed → implementing → report_generated → completed
+created → researching → plan_drafted → implementing → testing → completed
 ```
 
 ## 异常处理

@@ -16,7 +16,7 @@ description: 在流程关键节点执行门禁检查
 
 ### 检查清单
 
-1. **项目已初始化** — `.feflow/` 目录存在且 `init-config.md` 配置完整
+1. **项目已初始化** — `.feflow/` 目录存在且 `project/init-config.md` 配置完整
 2. **Item 已创建** — `.feflow/items/` 下存在当前 Item 文件，包含标题、描述、级别
 3. **记忆已加载** — `.feflow/memory/` 已读取，相关历史决策和团队约定已纳入上下文
 4. **仓库已扫描** — 已执行 repo-scan，技术栈、目录结构、关键文件已识别

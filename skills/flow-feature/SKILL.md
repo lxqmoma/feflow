@@ -9,7 +9,7 @@ description: 新功能开发流程。当 orchestrator 识别任务类型为 FEAT
 
 ## 前置条件
 
-- feflow 已初始化（`.feflow/` 目录存在且 `init-config.md` 配置完整）
+- feflow 已初始化（`.feflow/` 目录存在且 `project/init-config.md` 配置完整）
 - orchestrator 已完成任务分类并生成 Item（包含唯一 ID，如 `FEAT-001`）
 - memory-load 已执行
 
@@ -39,7 +39,7 @@ description: 新功能开发流程。当 orchestrator 识别任务类型为 FEAT
 
 | 维度 | L1 | L2 | L3 |
 |------|-----|-----|-----|
-| 分析方式 | 自行分析 | PM agent | PM + architect agent |
+| 分析方式 | 自行分析 | PM agent | PM + reviewer agent |
 | 验收标准 | 1-2 条 | 3-5 条 | 5+ 条，含非功能性 |
 | 风险分析 | 可省略 | 必须列出 | 列出 + 缓解方案 |
 
@@ -59,7 +59,7 @@ description: 新功能开发流程。当 orchestrator 识别任务类型为 FEAT
 
 ## 阶段 3：开发计划
 
-1. L1 自行制定；L2 调用 FE agent；L3 调用 FE + architect agent
+1. L1 自行制定；L2 调用 FE agent；L3 调用 FE + reviewer agent
 2. **深度代码调研（不可跳过）**：搜索相关代码，确认复用/修改/新建范围，引用的文件路径必须经 Glob/Read 验证
 3. **必须包含"历史问题对照"**：查询 memory 中相关历史问题和踩坑记录，标注规避措施
 4. 产出：`role-fe/dev-plan.md`（使用模板 `templates/dev-plan.md`）
