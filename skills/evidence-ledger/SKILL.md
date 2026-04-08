@@ -7,19 +7,16 @@ description: 证据账本管理。自动收集和维护每个 Item 的 Git/PR/CI
 
 ## 触发条件
 
-- flow 发布阶段（阶段 7）由 orchestrator 自动调用
-- quality-gate Gate 2 通过后、创建 PR 前调用
+- flow 发布阶段由 orchestrator 自动调用（Gate 2 通过后、创建 PR 前）
 - 用户执行 `/feflow-evidence` 或明确要求收集证据
 
 ## 前置条件
 
-1. 当前目录是 Git 仓库
-2. `.feflow/items/{ITEM-ID}/` 目录存在
-3. Item 已进入 implementing 或更后阶段
+当前目录是 Git 仓库，`.feflow/items/{ITEM-ID}/` 存在，Item 已进入 implementing 或更后阶段。
 
 ## 核心原则
 
-**证据层是最高可信度来源**，优先于文档描述和人工声明。当证据与文档矛盾时，以证据为准，并标记不一致项。
+**证据层是最高可信度来源**，优先于文档和人工声明。矛盾时以证据为准并标记不一致。
 
 ## 证据收集
 
@@ -42,34 +39,14 @@ description: 证据账本管理。自动收集和维护每个 Item 的 Git/PR/CI
 
 写入 `.feflow/items/{ITEM-ID}/evidence/evidence.md`：
 
-```markdown
----
-item_id: {ITEM-ID}
-generated_at: {ISO 8601}
-evidence_source: auto
----
-# 证据账本
+frontmatter 含 `item_id` / `generated_at` / `evidence_source: auto`。正文分区：
 
-## 分支
-- 分支名: feature/{ITEM-ID}-xxx
-- 基于: main @ {base-hash}
-
-## 提交记录
-| Hash | 作者 | 时间 | Message |
-|------|------|------|---------|
-
-## PR
-- PR #{N} — {标题} — 状态: {open/merged}
-
-## CI
-- lint: ✅/❌ | type-check: ✅/❌ | unit-test: ✅/❌
-
-## 部署
-- Preview: {URL} | Release: {version}
-
-## 统计
-- 改动文件: {N} | +{N} 行 / -{N} 行
-```
+- **分支** — 分支名、基于哪个 commit
+- **提交记录** — 表格（Hash / 作者 / 时间 / Message）
+- **PR** — 编号、标题、状态
+- **CI** — 各检查项结果
+- **部署** — preview 地址、release 版本
+- **统计** — 改动文件数、新增/删除行数
 
 ## 不一致检测
 
