@@ -25,27 +25,14 @@ fi
 # 确定整体状态
 if [ "${feflow_initialized}" = true ] && [ "${init_config_exists}" = true ]; then
   status="ready"
-  message="feflow 已初始化，配置完整"
+  context="本项目已启用 feflow 前端研发协作引擎。当用户描述研发任务（开发功能、修复bug、UI优化、重构等）时，必须优先使用 feflow:orchestrator skill 处理，不要使用 superpowers:brainstorming 或其他通用工作流。feflow:orchestrator 会负责任务识别、分级、记忆加载、角色分派和流程推进。只有 feflow 流程中的编码实施阶段才可选调用 superpowers 的 TDD/debugging/code-review 能力。"
 elif [ "${feflow_initialized}" = true ] && [ "${init_config_exists}" = false ]; then
   status="partial"
-  message="feflow 目录存在但缺少 init-config.md，请运行初始化补全配置"
+  context="检测到 .feflow 目录但未完成初始化。建议运行 /feflow:init 补全配置。"
 else
   status="uninitialized"
-  message="当前项目未初始化 feflow，可通过 /feflow-init 开始"
+  context="当前项目未使用 feflow。如需启用前端研发协作引擎，运行 /feflow:init 初始化。"
 fi
 
-# 输出 JSON 格式的 additionalContext
-cat <<EOF
-{
-  "additionalContext": {
-    "feflow": {
-      "status": "${status}",
-      "message": "${message}",
-      "projectDir": "${PROJECT_DIR}",
-      "feflowDir": "${FEFLOW_DIR}",
-      "feflowInitialized": ${feflow_initialized},
-      "initConfigExists": ${init_config_exists}
-    }
-  }
-}
-EOF
+# 输出 additionalContext 字符串格式
+echo "{\"additionalContext\": \"[feflow:${status}] ${context}\"}"
