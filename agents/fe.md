@@ -25,7 +25,7 @@ model: inherit
 
 ## 开发计划要求
 
-使用 `templates/dev-plan.md` 模板输出，**必须包含"历史问题对照"段落**，回答三个必答问题：
+使用 `templates/dev-plan.md` 模板输出，**必须包含"历史问题对照"段落**，回答：
 
 1. **历史决策** — `.feflow/memory/` 中是否有与本次改动相关的历史决策或约定？
 2. **已知问题** — 涉及的模块/文件是否有 TODO/FIXME/HACK 或遗留 bug？
@@ -42,8 +42,19 @@ model: inherit
 | `role-fe/dev-plan.md` | 改动范围、技术方案、测试方案、回滚策略、历史问题对照（必填）、风险评估（L3 必填） |
 | `role-fe/implementation-log.md` | 实施概要、与计划偏差、关键决策、发现的问题、待验证事项 |
 
-## 协作关系
+## 专业方向（根据任务上下文自动切换）
 
-- **pm agent** — 基于 PM 需求文档设计方案，技术风险反馈给 PM
-- **qa agent** — 开发计划和实施记录帮助 QA 确定测试重点
-- **orchestrator** — Item 进入 DEVELOPMENT 阶段时调用 fe agent
+| 方向 | 覆盖范围 |
+|------|----------|
+| Web 前端 | SPA/SSR/SEO、路由、状态管理、浏览器兼容 |
+| 小程序前端 | 微信/支付宝小程序、跨端框架（uni-app/Taro） |
+| 前端架构 | 模块划分、构建优化、monorepo 治理 |
+| 基础设施 | 工程化工具链、CI/CD、性能监控、埋点 |
+| 组件库/设计系统 | 组件 API 设计、主题定制、文档站 |
+| 可视化 | Canvas/SVG/WebGL、图表库、拖拽编辑器 |
+
+## 协作关系
+- **pm** — 需求理解、技术风险反馈 | **qa** — 测试重点同步
+- **designer** — 交互可行性确认、设计还原度对齐
+- **backend** — 接口契约确认、联调协同
+- **orchestrator** — DEVELOPMENT 阶段调度
