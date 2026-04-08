@@ -11,10 +11,7 @@
   "plugins": [
     {
       "name": "feflow",
-      "source": {
-        "source": "directory",
-        "path": "."
-      },
+      "source": ".",
       "description": "前端研发协作引擎 — 覆盖需求、设计、开发、测试、发布完整闭环的工作流插件",
       "version": "0.1.0"
     }
