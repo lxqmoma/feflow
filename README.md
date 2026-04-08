@@ -120,6 +120,7 @@ feflow/
 │   ├── scan.md            # /scan -- 扫描仓库
 │   └── memory.md          # /memory -- 管理记忆
 ├── templates/         # 12 个文档模板
+├── adapters/          # 多平台适配（Cursor/Windsurf/通用）
 ├── hooks/             # 生命周期钩子
 ├── package.json
 ├── CLAUDE.md
