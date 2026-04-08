@@ -22,33 +22,46 @@ Currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 ### Installation
 
 ```bash
-claude install-plugin https://github.com/lxqmoma/feflow
+# 1. Add marketplace
+claude plugins marketplace add lxqmoma/feflow
+
+# 2. Install plugin
+claude plugins install feflow@feflow-marketplace
 ```
 
 ### Initialization
 
-Run in your project root:
+Restart Claude Code, then run in your project root:
 
-```bash
-/init
+```
+/feflow:init
 ```
 
 This creates a `.feflow/` directory in your project for storing work items, memory, and configuration.
 
 ### Usage
 
-```bash
+```
 # Create a task and start workflow
-/task Implement user login page
+/feflow:task Implement user login page
 
 # View current work items
-/task list
+/feflow:task list
+
+# Item status dashboard
+/feflow:task dashboard
+
+# View evidence chain
+/feflow:task evidence FEAT-20260408-001
 
 # Scan repository status
-/scan
+/feflow:scan
 
 # View project memory
-/memory
+/feflow:memory
+
+# Memory decay check
+/feflow:memory decay
 ```
 
 ## Core Concepts
@@ -117,10 +130,16 @@ feflow/
 
 | Command | Description | Usage |
 |---------|-------------|-------|
-| `/init` | Initialize feflow workspace | `/init` |
-| `/task` | Create work item or view list | `/task Implement login page` or `/task list` |
-| `/scan` | Scan repository status | `/scan` |
-| `/memory` | View/manage project memory | `/memory` or `/memory add` |
+| `/feflow:init` | Initialize feflow workspace | `/feflow:init` |
+| `/feflow:task` | Create work item | `/feflow:task Implement login page` |
+| `/feflow:task list` | View all work items | `/feflow:task list` |
+| `/feflow:task dashboard` | Item status dashboard | `/feflow:task dashboard` |
+| `/feflow:task evidence` | View Item evidence chain | `/feflow:task evidence {ITEM-ID}` |
+| `/feflow:task deps` | View Item dependencies | `/feflow:task deps` |
+| `/feflow:scan` | Scan repository status | `/feflow:scan` |
+| `/feflow:memory` | View project memory | `/feflow:memory` |
+| `/feflow:memory add` | Add memory manually | `/feflow:memory add` |
+| `/feflow:memory decay` | Memory decay check | `/feflow:memory decay` |
 
 ## Flow Types
 
@@ -152,7 +171,7 @@ feflow/
 
 ## Relationship with Superpowers
 
-feflow is a domain plugin within the [Superpowers](https://github.com/jasonm/superpowers) ecosystem. They serve complementary purposes:
+feflow is an independent plugin that can collaborate with [Superpowers](https://github.com/obra/superpowers):
 
 | Dimension | Superpowers | feflow |
 |-----------|-------------|--------|

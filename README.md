@@ -22,33 +22,46 @@
 ### 安装
 
 ```bash
-claude install-plugin https://github.com/lxqmoma/feflow
+# 1. 添加 marketplace
+claude plugins marketplace add lxqmoma/feflow
+
+# 2. 安装插件
+claude plugins install feflow@feflow-marketplace
 ```
 
 ### 初始化
 
-在项目根目录执行：
+重启 Claude Code，在项目根目录执行：
 
-```bash
-/init
+```
+/feflow:init
 ```
 
 初始化后会在项目中创建 `.feflow/` 目录，存储工作项、记忆和配置。
 
 ### 使用
 
-```bash
+```
 # 创建任务并启动工作流
-/task 实现用户登录页面
+/feflow:task 实现用户登录页面
 
 # 查看当前工作项
-/task list
+/feflow:task list
+
+# Item 状态仪表盘
+/feflow:task dashboard
+
+# 查看证据链
+/feflow:task evidence FEAT-20260408-001
 
 # 扫描仓库状态
-/scan
+/feflow:scan
 
 # 查看项目记忆
-/memory
+/feflow:memory
+
+# 记忆衰减检查
+/feflow:memory decay
 ```
 
 ## 核心概念
@@ -117,10 +130,16 @@ feflow/
 
 | 命令 | 说明 | 用法 |
 |------|------|------|
-| `/init` | 初始化 feflow 工作区 | `/init` |
-| `/task` | 创建工作项或查看列表 | `/task 实现登录页面` 或 `/task list` |
-| `/scan` | 扫描仓库状态 | `/scan` |
-| `/memory` | 查看/管理项目记忆 | `/memory` 或 `/memory add` |
+| `/feflow:init` | 初始化 feflow 工作区 | `/feflow:init` |
+| `/feflow:task` | 创建工作项或查看列表 | `/feflow:task 实现登录页面` |
+| `/feflow:task list` | 查看所有工作项 | `/feflow:task list` |
+| `/feflow:task dashboard` | Item 状态仪表盘 | `/feflow:task dashboard` |
+| `/feflow:task evidence` | 查看 Item 证据链 | `/feflow:task evidence {ITEM-ID}` |
+| `/feflow:task deps` | 查看 Item 依赖关系 | `/feflow:task deps` |
+| `/feflow:scan` | 扫描仓库状态 | `/feflow:scan` |
+| `/feflow:memory` | 查看项目记忆 | `/feflow:memory` |
+| `/feflow:memory add` | 手动添加记忆 | `/feflow:memory add` |
+| `/feflow:memory decay` | 记忆衰减检查 | `/feflow:memory decay` |
 
 ## 流程类型
 
@@ -152,7 +171,7 @@ feflow/
 
 ## 与 Superpowers 的关系
 
-feflow 是 [Superpowers](https://github.com/jasonm/superpowers) 生态中的领域插件，两者各司其职：
+feflow 是独立插件，可与 [Superpowers](https://github.com/obra/superpowers) 协作：
 
 | 维度 | Superpowers | feflow |
 |------|-------------|--------|
