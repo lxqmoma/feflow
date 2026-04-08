@@ -101,9 +101,18 @@ secondary_types: [{次要类型，若有}]
 
 | 流程 Skill | 适用类型 |
 |------------|----------|
-| `feflow:flow-feature` | `FEAT`、`MOD`、`UI`、`DESIGN`、`CHANGE`、`REFACTOR`、`TEST`、`CICD`、`DEBT` |
+| `feflow:flow-feature` | `FEAT`、`DEBT` |
+| `feflow:flow-modification` | `MOD` |
+| `feflow:flow-refactor` | `REFACTOR` |
+| `feflow:flow-test-task` | `TEST` |
+| `feflow:flow-ui-optimize` | `UI` |
+| `feflow:flow-design` | `DESIGN` |
+| `feflow:flow-change-request` | `CHANGE` |
+| `feflow:flow-cicd` | `CICD` |
 | `feflow:flow-bugfix` | `BUG` |
 | `feflow:flow-hotfix` | `HOTFIX` |
+
+涉及 legacy/高耦合区域的任务，在正常流程前叠加 `feflow:flow-legacy` 模式。
 
 调用时传递：Item ID、流程级别、角色配置、已加载的记忆上下文。
 
@@ -122,6 +131,8 @@ secondary_types: [{次要类型，若有}]
 | Designer | UI/DESIGN 类型任务，或 L3 任务 | 视觉/交互方案、设计系统一致性、状态完整性 |
 | Backend | 涉及 API/接口/数据结构变更的任务 | 接口评审、数据结构对齐、联调方案 |
 | QA | L2、L3、L4 | 测试策略、用例设计、验收确认 |
+| Reviewer | L3，或代码审查阶段 | 不变量检查、历史错误防重犯、技术债评估 |
+| Researcher | 按需（任务涉及陌生模块/技术） | 深度代码阅读、历史 commit 分析、技术调研 |
 
 角色行为由流程 skill 内部实现，orchestrator 仅确定角色配置并传递。
 
