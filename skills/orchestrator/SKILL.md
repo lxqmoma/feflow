@@ -68,6 +68,10 @@ description: Feflow 总控入口。识别任务类型、判断流程级别、创
 
 示例：`FEAT-20260408-001-user-avatar-upload`、`BUG-20260408-001-login-captcha-refresh`
 
+**依赖检查：** 创建 Item 后，调用 `feflow:item-orchestration` 检查是否与其他活跃 Item 存在依赖或文件冲突。
+
+**自定义流程检查：** 调用 `feflow:custom-flow` 检查 `.feflow/workflows/` 下是否有匹配当前任务类型的自定义 Flow，有则优先使用。
+
 **创建工作项：** 先向用户确认将在 `.feflow/items/` 下创建工作项文件，确认后用 Write 创建 `meta.md`：
 
 ```markdown

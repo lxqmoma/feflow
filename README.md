@@ -66,7 +66,7 @@ claude install-plugin https://github.com/lxqmoma/feflow
 
 ```
 feflow/
-├── skills/            # 21 个技能定义
+├── skills/            # 26 个技能定义
 │   ├── orchestrator/      # 任务编排与调度
 │   ├── flow-feature/      # 需求开发流程
 │   ├── flow-bugfix/       # 缺陷修复流程
@@ -84,10 +84,15 @@ feflow/
 │   ├── topology-detect/   # 拓扑检测
 │   ├── memory-load/       # 记忆加载
 │   ├── memory-update/     # 记忆更新
+│   ├── memory-decay/      # 记忆衰减与归档
 │   ├── project-init/      # 项目初始化
 │   ├── quality-gate/      # 质量门禁
 │   ├── evidence-ledger/   # 证据台账
-│   └── backfill/          # 证据补录
+│   ├── evidence-chain/    # 证据链可视化
+│   ├── backfill/          # 证据补录
+│   ├── item-orchestration/ # 多 Item 依赖编排
+│   ├── custom-flow/       # 自定义流程模板
+│   └── dashboard/         # 仪表盘
 ├── agents/            # 7 个角色 agent
 │   ├── pm.md              # 产品/需求
 │   ├── designer.md        # UI/UX 设计

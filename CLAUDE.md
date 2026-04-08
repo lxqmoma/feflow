@@ -15,14 +15,14 @@
 
 ```
 feflow/
-├── skills/          # 技能定义（Claude 可调用的领域能力）
-├── agents/          # 智能体配置（组合 skills 完成复杂任务）
-├── hooks/           # 生命周期钩子（SessionStart/PreCommit 等）
-├── commands/        # 自定义命令（/feflow-xxx 形式）
-├── templates/       # 模板文件（生成 Item 的初始结构）
-├── hooks.json       # 钩子注册清单
+├── skills/          # 26 个技能定义（流程、记忆、质量、编排等）
+├── agents/          # 7 个角色（PM/Designer/FE/Backend/QA/Reviewer/Researcher）
+├── hooks/           # 生命周期钩子（SessionStart 检测）
+├── commands/        # 4 个命令（/init /task /scan /memory）
+├── templates/       # 12 个文档模板
+├── adapters/        # 多平台适配（Cursor/Windsurf/通用）
 ├── package.json     # 插件元信息
-└── CLAUDE.md        # 本文件，插件说明与约定
+└── CLAUDE.md        # 本文件
 ```
 
 ## 核心概念

@@ -66,7 +66,7 @@ This creates a `.feflow/` directory in your project for storing work items, memo
 
 ```
 feflow/
-├── skills/            # 21 skill definitions
+├── skills/            # 26 skill definitions
 │   ├── orchestrator/      # Task orchestration & dispatch
 │   ├── flow-feature/      # Feature development flow
 │   ├── flow-bugfix/       # Bug fix flow
@@ -84,10 +84,15 @@ feflow/
 │   ├── topology-detect/   # Topology detection
 │   ├── memory-load/       # Memory loading
 │   ├── memory-update/     # Memory updating
+│   ├── memory-decay/      # Memory decay & archival
 │   ├── project-init/      # Project initialization
 │   ├── quality-gate/      # Quality gate
 │   ├── evidence-ledger/   # Evidence ledger
-│   └── backfill/          # Evidence backfill
+│   ├── evidence-chain/    # Evidence chain visualization
+│   ├── backfill/          # Evidence backfill
+│   ├── item-orchestration/ # Multi-Item dependency orchestration
+│   ├── custom-flow/       # Custom flow templates
+│   └── dashboard/         # Dashboard
 ├── agents/            # 7 role agents
 │   ├── pm.md              # Product / Requirements
 │   ├── designer.md        # UI/UX Design
