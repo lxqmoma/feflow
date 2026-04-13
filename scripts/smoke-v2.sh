@@ -19,6 +19,8 @@ required_files=(
   "commands/task.md"
   "commands/scan.md"
   "hooks/session-start/detect.sh"
+  "scripts/guard-feflow-skill.py"
+  "scripts/guard-feflow-stop.py"
   "skills/orchestrator/SKILL.md"
   "skills/quality-gate/SKILL.md"
   "examples/minimal-v2-workspace/README.md"
@@ -213,6 +215,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q 'guard-feflow-skill.py|guard-feflow-stop.py' "commands/init.md" "commands/task.md" || {
+    echo "command runtime guard hooks are missing" >&2
+    exit 1
+  }
+
   if rg -n '\$0|\$1|\$2|\$3' "commands/init.md" "commands/task.md"; then
     echo "command dispatch contains raw slash-command argument placeholders that can corrupt shell scripts" >&2
     exit 1
@@ -225,6 +232,11 @@ if command -v rg >/dev/null 2>&1; then
 
   rg -q 'pua:\*|unrelated style, persona, or workflow skills|外部 persona / workflow skill' "runtime/frontend-harness.md" "commands/init.md" "commands/task.md" "V2-ACCEPTANCE-SUITE.md" || {
     echo "external skill suppression guidance is missing" >&2
+    exit 1
+  }
+
+  rg -q '不要输出 `★ Insight`|审计模板|operator-style' "commands/init.md" "commands/task.md" "runtime/frontend-harness.md" "V2-ACCEPTANCE-SUITE.md" || {
+    echo "concise operator-style output guidance is missing" >&2
     exit 1
   }
 
@@ -384,6 +396,11 @@ else
     exit 1
   }
 
+  grep -qE 'guard-feflow-skill.py|guard-feflow-stop.py' "commands/init.md" "commands/task.md" || {
+    echo "command runtime guard hooks are missing" >&2
+    exit 1
+  }
+
   if grep -nE '\$0|\$1|\$2|\$3' "commands/init.md" "commands/task.md"; then
     echo "command dispatch contains raw slash-command argument placeholders that can corrupt shell scripts" >&2
     exit 1
@@ -396,6 +413,11 @@ else
 
   grep -qE 'pua:\*|unrelated style, persona, or workflow skills|外部 persona / workflow skill' "runtime/frontend-harness.md" "commands/init.md" "commands/task.md" "V2-ACCEPTANCE-SUITE.md" || {
     echo "external skill suppression guidance is missing" >&2
+    exit 1
+  }
+
+  grep -qE '不要输出 `★ Insight`|审计模板|operator-style' "commands/init.md" "commands/task.md" "runtime/frontend-harness.md" "V2-ACCEPTANCE-SUITE.md" || {
+    echo "concise operator-style output guidance is missing" >&2
     exit 1
   }
 

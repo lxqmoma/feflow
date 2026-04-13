@@ -9,6 +9,16 @@ allowed-tools:
   - Edit
   - Grep
   - Glob
+hooks:
+  PreToolUse:
+    - matcher: "Skill"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard-feflow-skill.py pua:"
+  Stop:
+    - hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard-feflow-stop.py init"
 ---
 
 # /init
@@ -216,6 +226,8 @@ printf 'END_FEFLOW_INIT_DISPATCH\n'
 - 不要把这次回复写成初始化思路说明
 - 首条用户可见文本必须直接基于 `BEGIN_FEFLOW_INIT_DISPATCH` 的结果汇报
 - 不要在这个命令里再调用无关的外部 persona / workflow skill，例如 `pua:*`
+- 不要输出 `★ Insight`
+- 不要套用“1. 改动概述 / 2. 修改原因 / 3. 影响范围 ...”这种审计模板
 - 如果 `created_*` 为 `none`，说明这是一次幂等校验或补全，不要假装刚刚新建了不存在的内容
 - 如果 `preserved_files` 不为 `none`，明确说明已有文件被保留、未覆盖
 - 先给结果，再给下一步建议
@@ -356,6 +368,7 @@ printf 'END_FEFLOW_INIT_DISPATCH\n'
 - “使用 superpowers:using-superpowers 和 feflow:project-init ...”
 - “当前没有可用文件工具，所以我先给你一份方案”
 - “★ Insight …” 后面仍然没有任何创建结果
+- “1. 改动概述 / 2. 修改原因 / 3. 影响范围 ...”
 
 暂停预算：
 

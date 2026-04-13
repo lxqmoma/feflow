@@ -93,6 +93,7 @@ Each golden should feel:
 
 - treats the slash command as an execution request
 - makes the first visible sentence post-execution, not pre-execution
+- stays concise instead of expanding into an audit template
 - keeps pause budget at zero for safe bounded init
 - avoids exposing internal skill/router plumbing
 - closes the loop in the same turn instead of ending after a promise
@@ -107,6 +108,8 @@ Each golden should feel:
 - “我先讲一下初始化思路，下一条再做”
 - “请你再发一次 `/feflow:init`”
 - “我先直接把 `.feflow/` 建起来 …” 然后没有任何创建结果
+- “★ Insight …”
+- “1. 改动概述 / 2. 修改原因 / 3. 影响范围 ...”
 
 ---
 

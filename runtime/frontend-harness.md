@@ -43,6 +43,8 @@ In particular, suppress auto-invocation of skills such as:
 
 The command owner should remain `feflow`, not an accidental sidecar persona.
 
+When the host supports hooks, enforce this at runtime with `PreToolUse` guards instead of relying only on prose.
+
 ## Tool Availability Truth Source
 
 For feflow commands, the source of truth for tool availability is the current host session metadata.
@@ -193,6 +195,7 @@ That means:
 - the first user-visible sentence should report what was inspected, created, repaired, or preserved
 - do not open with future-tense narration such as "我先", "I will", or "next I am going to"
 - do not place an `Insight` / process block before the first concrete result
+- prefer a short operator-style result over numbered audit templates for `/feflow:init` and L1 `/feflow:task`
 
 ### `/feflow:init`
 

@@ -9,6 +9,16 @@ allowed-tools:
   - Edit
   - Grep
   - Glob
+hooks:
+  PreToolUse:
+    - matcher: "Skill"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard-feflow-skill.py pua:"
+  Stop:
+    - hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard-feflow-stop.py task"
 ---
 
 # /task
@@ -115,6 +125,8 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 - `dispatch_mode=delivery` 时，不要把这轮回复写成治理流程介绍
 - `dispatch_mode=list/dashboard/deps/evidence` 时，直接基于当前工作区继续，不要重讲 `/task` 的语义
 - 不要在这个命令里再调用无关的外部 persona / workflow skill，例如 `pua:*`
+- 不要输出 `★ Insight`
+- 不要套用“1. 改动概述 / 2. 修改原因 / 3. 影响范围 ...”这种审计模板
 - 如果接下来要继续用 `Read / Grep / Edit / Bash`，可以继续，但第一条文本必须已经带有检查后的事实
 
 ## 触发方式
@@ -239,6 +251,7 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 - “使用 superpowers:using-superpowers ...”
 - “当前没有可用文件工具，我先说一下方案”
 - “我先研究一下，再回来告诉你计划”
+- “1. 改动概述 / 2. 修改原因 / 3. 影响范围 ...”
 
 暂停预算：
 
