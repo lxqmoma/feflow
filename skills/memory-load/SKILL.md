@@ -1,103 +1,130 @@
 ---
 name: memory-load
-description: 每次任务启动时使用。按当前任务类型、涉及模块和风险级别，从 .feflow/memory/ 中检索相关历史经验，产出记忆摘要。
+description: 选择性记忆加载。v2 中它是治理增强能力，不是所有任务的默认硬前置。
 ---
 
-# memory-load: 任务前记忆加载
+# memory-load — v2 选择性记忆加载
+
+`memory-load` 的目标是把高信号历史约束带回当前任务，而不是把整个记忆库塞进上下文。
+
+## 定位
+
+在 v2 中，`memory-load` 是可选增强：
+
+- 对 Assist：按需加载
+- 对 Delivery-L1：通常跳过
+- 对 Delivery-L2：推荐选择性加载
+- 对 Delivery-L3 / Incident：应加载关键约束和历史风险
+
+它不再依赖“先创建 Item，才能读取记忆”。
 
 ## 触发时机
 
-由 orchestrator 在创建 Item 后、分配执行 agent 前调用。
-目的是将项目积累的历史经验注入当前任务上下文，避免重复踩坑。
+推荐在以下时机调用：
+
+1. 已经完成模式和风险判断之后
+2. 已经初步知道涉及模块之后
+3. 在真正实施前，且确认记忆对决策有帮助时
+
+不建议：
+
+- 在所有任务开始时无差别加载
+- 在还没读代码前先堆记忆
 
 ## 输入
 
-orchestrator 传入当前 Item 的基本信息：
-`item_id` / `item_type`(feat/fix/refactor/hotfix/chore) / `modules`(模块列表) / `risk_level`(low/medium/high/critical) / `title` / `description`(可选)
+推荐输入：
 
-## 加载步骤
+- `mode`：assist / delivery / incident
+- `task_type`
+- `modules`
+- `risk_level`
+- `title`
+- `description`
+- `tracked_item`（可选）
 
-### 第一步：读取全局不变量
+## 加载策略
 
-读取 `.feflow/memory/project/invariants.md`，项目级硬性约束，任何任务都必须遵守。若文件不存在，跳过。
+### 第一层：全局约束
 
-### 第二步：读取 AI 编码戒律
+读取：
 
-读取 `.feflow/memory/project/coding-doctrine.md`，团队编码规范和 AI 协作约定。若文件不存在，跳过。
+- `.feflow/memory/project/invariants.md`
+- `.feflow/memory/project/coding-doctrine.md`
 
-### 第三步：按模块查找模块记忆
+仅在文件存在时加载。
 
-遍历 `.feflow/memory/modules/`，匹配规则：
-1. 文件名包含模块名（如 `auth.md` 匹配 `auth`）
-2. frontmatter `scope` 包含目标模块名
-3. 仅加载 `status: active` 的记忆条目
+### 第二层：模块记忆
 
-提取每条记忆的场景、问题、根因、规避方式。
+基于 `modules` 精确匹配：
 
-### 第四步：查找相关事件记忆
+- 文件名
+- frontmatter scope
+- 内容中的明确模块关键词
 
-扫描 `.feflow/memory/incidents/` 和 `.feflow/memory/patterns/`。
+### 第三层：事件与模式
 
-匹配条件（任一命中）：scope 包含当前模块 / type 与任务类型相同 / 内容含模块名关键词。
+当 `risk_level` 较高，或任务命中历史高风险区域时，加载：
 
-`risk_level` 为 high 或 critical 时放宽匹配：额外加载所有 `type: incident` 和 `scope: global` 的记忆。
+- `incidents/`
+- `patterns/`
 
-### 第五步：查找历史相似 Item
+### 第四层：相似历史工作
 
-扫描 `.feflow/items/`，相似判定（满足两项及以上）：相同模块 / 相同类型 / 标题描述含相同关键词。
+只有在以下场景才读取历史 Item：
 
-提取：实际耗时与预估偏差、未预见问题、最终方案变更。
+- 当前任务预计跨会话
+- 当前任务疑似高复发
+- 当前任务需要估算风险或回滚复杂度
 
-## 筛选条件
+## 降级策略
 
-1. **状态过滤** — 仅 `status: active`，跳过 `archived` / `superseded`
-2. **scope 匹配** — 与当前模块有交集，或 scope 为 `global`
-3. **内容相关性** — 含当前模块名、技术栈名或业务术语
-4. **去重** — 同一 `memory_id` 仅保留一次
+### `.feflow/` 不存在
 
-## 产出格式
+直接返回“无持久化记忆可用”，不作为阻塞项。
 
-生成 `00-memory-brief.md`（前缀 `00-` 确保排在最前），摘要控制在 20 行以内。核心结构：
+### 记忆为空
 
-```markdown
----
-item_id: {id}
-generated_at: {ISO 8601}
-memory_count: {N}
-risk_level: {level}
-modules: [...]
----
+返回最小化结果，不强行生成长摘要。
 
-# 记忆摘要
+### 文件解析失败
 
-## 全局不变量
-- **[INV-xxx]** {约束描述}
+跳过损坏条目，保留警告，不中止主任务。
 
-## 编码戒律
-- **[DOC-xxx]** {规范描述}
+## 输出形式
 
-## 模块记忆
-### {模块名}
-- **[MEM-xxx]** {标题} — 场景/问题/根因/规避方式
+### 有工作区且任务被追踪
 
-## 历史事件
-- **[INC-xxx]** {日期} {事件标题} — 影响/根因/教训
+可生成 `00-memory-brief.md`。
 
-## 本次必须额外检查
-1. {检查项}
-```
+### 无工作区或未追踪任务
 
-记忆库为空时输出最小化摘要：标注「项目刚初始化，暂无历史记忆记录」，各分区标注「暂无记录」。
+以内联短摘要形式供执行使用，不必写文件。
 
-## 执行约束
+## 输出要求
 
-1. memory-load 是只读操作，不修改任何记忆文件
-2. 文件解析错误时跳过并标注警告
-3. 单次加载上限 30 条，超出按优先级截断：全局不变量 > 编码戒律 > 事件记忆(时间倒序) > 模块记忆(匹配度) > 历史 Item(最多 5 条)
-4. 加载耗时不超过 5 秒，记忆库文件过多时优先加载 scope 精确匹配的文件
+只保留高价值信息，例如：
+
+- 项目级不变量
+- 已知高风险边界
+- 历史回归点
+- 避坑约束
+- 与当前任务直接相关的旧决策
+
+不要输出：
+
+- 大量无关历史
+- 低价值重复信息
+- 仅因存在而加载的长记忆清单
+
+## 性能与预算
+
+1. 默认加载条目不超过 15 条
+2. 优先级顺序：不变量 > 编码戒律 > 高风险事件 > 模块记忆 > 历史 Item
+3. 超时或条目过多时，优先保留精确匹配项
 
 ## 与其他 skill 的关系
 
-- **上游**：orchestrator 创建 Item 后调用
-- **下游**：执行 agent 读取 `00-memory-brief.md` 开始工作
-- **对称**：memory-update 在任务后写入新记忆，供后续 memory-load 检索
+- 上游通常是 `orchestrator`
+- 下游通常是 Delivery 或 Incident 的实际执行
+- `memory-update` 与其对称，但不要为了对称而强行在每次任务前后都调用

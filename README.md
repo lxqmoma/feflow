@@ -2,224 +2,240 @@
 
 # feflow
 
-前端研发协作引擎 -- AI 编程助手插件，为前端项目提供完整的研发工作流管理。
+前端研发协作治理层。
 
-当前支持 [Claude Code](https://docs.anthropic.com/en/docs/claude-code)。
+feflow 的目标不是把每个请求都包装成“先立项、再分阶段确认”的流程，而是让 AI 在前端研发场景下：
 
-## 特性亮点
+- 该直接读仓库时直接读
+- 该直接做小改动时直接做
+- 该引入治理时再引入治理
+- 该处理事故时优先止血
 
-- **全流程覆盖** -- 需求、设计、开发、测试、发布，10 种任务流程开箱即用
-- **多角色协作** -- 7 个专业角色（PM/Designer/FE/Backend/QA/Reviewer/Researcher），由编排器按需调度
-- **项目记忆** -- 5 层记忆系统（永久/模块/中期/事件/短期），跨会话持久化项目上下文
-- **仓库态势感知** -- 4 层扫描，自动识别技术栈、目录结构和关键配置
-- **证据驱动** -- 测试结果、审查记录、构建产物作为完成依据，拒绝"自我声明"
-- **技术栈自动检测** -- 识别项目技术栈并自动安装对应 skill
-- **Legacy 支持** -- 专用 legacy 叠加模式，啃屎山也有章法
-- **补录机制** -- 支持事后补充证据和上下文，不强制线性流程
+v2 的核心方向是：**默认体验接近强助手，治理能力按风险介入。**
+
+## 它解决什么问题
+
+通用编码助手在前端研发协作里，常见缺口有四类：
+
+1. 缺少可持续的项目记忆
+2. 缺少跨阶段的任务追踪
+3. 缺少基于证据的完成判定
+4. 缺少对事故、发布、跨模块改动的治理约束
+
+feflow 保留这些能力，但不再把它们变成所有任务的默认负担。
+
+## v2 设计哲学
+
+### 1. 默认直接，不默认流程化
+
+读仓库、解释代码、分析插件、评审架构，这些任务不应该先初始化、先建 Item、先走 flow。
+
+### 2. 治理按风险介入
+
+只有当任务真的需要追踪、证据、依赖管理、多人协作、回滚约束时，才进入更重的治理路径。
+
+### 3. 控制平面隐藏
+
+`skill`、`hook`、`gate`、`role`、`Item`、`memory layer` 是内部实现概念，不应该成为用户主要面对的产品语言。
+
+### 4. 事故优先恢复，不优先补材料
+
+线上故障、回滚、紧急修复，优先恢复业务与隔离影响，证据和复盘可以在稳定后补齐。
+
+### 5. 证据只在有价值时强制
+
+小而局部的低风险任务，不应该为了“完整性”强行拉起整套证据链。
+
+## 三种模式
+
+### Assist
+
+只读分析模式，用于：
+
+- 深度理解仓库或插件
+- 解释模块、架构、数据流
+- 评审 prompt / flow / 设计哲学
+- 分析风险点、耦合点、体验问题
+
+特点：
+
+- 不要求 `.feflow/`
+- 不默认创建 Item
+- 不应该把阅读任务拆成很多轮确认
+
+### Delivery
+
+交付模式，用于：
+
+- 改代码
+- 改配置
+- 写测试
+- 调整脚本
+- 修改文档或流程
+
+特点：
+
+- 先按风险判断
+- L1 任务可直接做
+- L2/L3 再逐步引入 Item、记忆、证据、门禁
+
+### Incident
+
+事件模式，用于：
+
+- 线上事故
+- 热修复
+- 发布异常
+- 高优先级稳定性问题
+
+特点：
+
+- 先止血
+- 优先最小恢复方案
+- 稳定后再补充复盘和长期修复
+
+## 风险分级
+
+| 级别 | 含义 | 默认策略 |
+|------|------|----------|
+| **L1** | 局部、小范围、低风险 | 直接分析/修改/验证，通常不建 Item |
+| **L2** | 多文件或中等风险 | 轻量治理，Item 可选但通常有帮助 |
+| **L3** | 跨模块、迁移、外部行为风险明显 | 应启用 Item、评审、证据、回滚约束 |
+| **Incident** | 生产事件、时间敏感故障 | 先恢复，后补治理材料 |
 
 ## 快速开始
 
 ### 安装
 
 ```bash
-# 1. 添加 marketplace
 claude plugins marketplace add lxqmoma/feflow
-
-# 2. 安装插件
 claude plugins install feflow@feflow-marketplace
 ```
 
-### 初始化
+### 推荐使用方式
 
-重启 Claude Code，在项目根目录执行：
+```text
+# 只读理解/评审
+/feflow:assist 深度理解这个插件
+/feflow:assist 评审当前 flow 的设计问题
 
+# 仓库画像
+/feflow:scan
+
+# 实际交付
+/feflow:task 修复构建失败
+/feflow:task 实现用户登录页
+
+# 事故处理
+/feflow:incident 发布后首页白屏，先帮我止血
 ```
+
+### 什么时候需要初始化
+
+只有当你要启用完整治理能力时，才需要：
+
+```text
 /feflow:init
 ```
 
-初始化后会在项目中创建 `.feflow/` 目录，存储工作项、记忆和配置。
+初始化会创建 `.feflow/` 工作区，用于：
 
-### 使用
+- Item 持久化
+- 项目记忆
+- 证据沉淀
+- 依赖关系与仪表盘
 
-```
-# 创建任务并启动工作流
-/feflow:task 实现用户登录页面
+以下场景通常**不需要**初始化：
 
-# 查看当前工作项
-/feflow:task list
+- 读仓库
+- 架构分析
+- 插件评审
+- prompt / flow 评审
+- 很多 L1 小改动
 
-# Item 状态仪表盘
-/feflow:task dashboard
+## 命令
 
-# 查看证据链
-/feflow:task evidence FEAT-20260408-001
-
-# 扫描仓库状态
-/feflow:scan
-
-# 查看项目记忆
-/feflow:memory
-
-# 记忆衰减检查
-/feflow:memory decay
-```
-
-## 核心概念
-
-| 概念 | 说明 |
+| 命令 | 说明 |
 |------|------|
-| **Item** | 研发活动的最小单元，拥有唯一标识、状态、上下文和产出物 |
-| **Flow** | Item 的状态流转路径，定义阶段、准入条件和检查点 |
-| **Memory** | 项目级持久化上下文，跨会话存储决策、约定和经验 |
-| **Evidence** | 验证完成质量的客观依据（测试结果、审查记录等） |
-| **Gate** | 阶段准入/准出检查，确保流程质量可控 |
-| **Role** | 专业角色 agent，由编排器根据任务类型按需调度 |
+| `/feflow:assist` | 只读分析入口 |
+| `/feflow:task` | 交付入口，按风险决定治理深度 |
+| `/feflow:incident` | 事故/热修复入口 |
+| `/feflow:scan` | 仓库扫描与风险画像 |
+| `/feflow:init` | 初始化 `.feflow/` 工作区 |
+| `/feflow:memory` | 查看或管理持久化项目记忆 |
 
-## 插件结构
+## 仓库结构
 
-```
+```text
 feflow/
-├── skills/            # 26 个技能定义
-│   ├── orchestrator/      # 任务编排与调度
-│   ├── flow-feature/      # 需求开发流程
-│   ├── flow-bugfix/       # 缺陷修复流程
-│   ├── flow-hotfix/       # 紧急修复流程
-│   ├── flow-modification/ # 功能修改流程
-│   ├── flow-ui-optimize/  # UI 优化流程
-│   ├── flow-design/       # 设计任务流程
-│   ├── flow-change-request/ # 变更请求流程
-│   ├── flow-cicd/         # CI/CD 流程
-│   ├── flow-refactor/     # 重构流程
-│   ├── flow-test-task/    # 测试任务流程
-│   ├── flow-legacy/       # Legacy 叠加模式
-│   ├── repo-scan/         # 仓库扫描
-│   ├── stack-detect/      # 技术栈检测
-│   ├── topology-detect/   # 拓扑检测
-│   ├── memory-load/       # 记忆加载
-│   ├── memory-update/     # 记忆更新
-│   ├── memory-decay/      # 记忆衰减与归档
-│   ├── project-init/      # 项目初始化
-│   ├── quality-gate/      # 质量门禁
-│   ├── evidence-ledger/   # 证据台账
-│   ├── evidence-chain/    # 证据链可视化
-│   ├── backfill/          # 证据补录
-│   ├── item-orchestration/ # 多 Item 依赖编排
-│   ├── custom-flow/       # 自定义流程模板
-│   └── dashboard/         # 仪表盘
-├── agents/            # 7 个角色 agent
-│   ├── pm.md              # 产品/需求
-│   ├── designer.md        # UI/UX 设计
-│   ├── fe.md              # 前端实现
-│   ├── backend.md         # 后端协作
-│   ├── qa.md              # 测试/QA
-│   ├── reviewer.md        # 架构守卫
-│   └── researcher.md      # 深度调研
-├── commands/          # 4 个命令
-│   ├── init.md            # /init -- 初始化工作区
-│   ├── task.md            # /task -- 创建/查看工作项
-│   ├── scan.md            # /scan -- 扫描仓库
-│   └── memory.md          # /memory -- 管理记忆
-├── templates/         # 12 个文档模板
-├── adapters/          # 多平台适配（Cursor/Windsurf/通用）
-├── hooks/             # 生命周期钩子
-├── package.json
-├── CLAUDE.md
-└── LICENSE
+├── skills/      # 流程、扫描、记忆、证据、门禁等能力
+├── agents/      # PM / Designer / FE / Backend / QA / Reviewer / Researcher
+├── commands/    # assist / task / incident / scan / init / memory
+├── adapters/    # Cursor / Windsurf / 通用 AGENTS 适配
+├── hooks/       # SessionStart 检测与上下文注入
+├── scripts/     # 本地 smoke 检查等辅助脚本
+├── templates/   # 工作区与治理模板
+├── examples/    # 最小 v2 工作区样例
+├── README.md
+└── CLAUDE.md
 ```
 
-## 命令列表
+## 样例
 
-| 命令 | 说明 | 用法 |
-|------|------|------|
-| `/feflow:init` | 初始化 feflow 工作区 | `/feflow:init` |
-| `/feflow:task` | 创建工作项或查看列表 | `/feflow:task 实现登录页面` |
-| `/feflow:task list` | 查看所有工作项 | `/feflow:task list` |
-| `/feflow:task dashboard` | Item 状态仪表盘 | `/feflow:task dashboard` |
-| `/feflow:task evidence` | 查看 Item 证据链 | `/feflow:task evidence {ITEM-ID}` |
-| `/feflow:task deps` | 查看 Item 依赖关系 | `/feflow:task deps` |
-| `/feflow:scan` | 扫描仓库状态 | `/feflow:scan` |
-| `/feflow:memory` | 查看项目记忆 | `/feflow:memory` |
-| `/feflow:memory add` | 手动添加记忆 | `/feflow:memory add` |
-| `/feflow:memory decay` | 记忆衰减检查 | `/feflow:memory decay` |
+仓库内提供了一个最小可读的 v2 工作区样例，方便直接检查 `.feflow` 在新设计下应该长什么样：
 
-## 流程类型
+- [`examples/minimal-v2-workspace/README.md`](./examples/minimal-v2-workspace/README.md)
 
-| 流程 | 适用场景 | Skill |
-|------|----------|-------|
-| Feature | 新功能开发 | `flow-feature` |
-| Modification | 现有功能修改 | `flow-modification` |
-| Bugfix | 缺陷修复 | `flow-bugfix` |
-| Hotfix | 紧急线上修复 | `flow-hotfix` |
-| UI Optimize | UI/交互优化 | `flow-ui-optimize` |
-| Design | 设计相关任务 | `flow-design` |
-| Change Request | 变更请求 | `flow-change-request` |
-| CI/CD | 构建部署任务 | `flow-cicd` |
-| Refactor | 代码重构 | `flow-refactor` |
-| Test Task | 测试任务 | `flow-test-task` |
-| Legacy (叠加) | 遗留代码改造，可叠加到任意流程 | `flow-legacy` |
+## 本地自检
 
-## 角色一览
+仓库内提供了一个最小 smoke 检查脚本，用来确认 v2 的关键入口还在，且明显的 v1 官僚式话术没有重新混回核心路径：
 
-| 角色 | 职责 | 调度时机 |
-|------|------|----------|
-| **PM** | 需求理解、文档整理、歧义发现、验收标准 | 需求分析阶段 |
-| **Designer** | UI 视觉设计、UX 交互设计 | UI/DESIGN 类任务、L3 任务 |
-| **FE** | 技术方案、代码改动计划、模块影响分析、编码实施 | 开发阶段 |
-| **Backend** | API 对接、接口协议、数据结构调整 | 前后端协同任务 |
-| **QA** | 测试范围、回归清单、边界场景、多端验证 | 测试阶段 |
-| **Reviewer** | 架构守卫、不变量检查、防止历史错误复现 | 代码审查、L3 任务 |
-| **Researcher** | 深度阅读代码、参考资料、竞品分析、历史提交 | 按需启用 |
+```bash
+./scripts/smoke-v2.sh
+```
+
+## Dogfood 验收
+
+除了静态 smoke，仓库还提供了一份行为验收规范，用来人工回归 `Assist / Delivery-L1 / Delivery-L3 / Incident` 四类真实请求：
+
+- [`V2-ACCEPTANCE-SUITE.md`](./V2-ACCEPTANCE-SUITE.md)
 
 ## 与 Superpowers 的关系
 
-feflow 是独立插件，可与 [Superpowers](https://github.com/obra/superpowers) 协作：
+feflow 不应该和 Superpowers 竞争“谁来接管所有任务”，而应该形成分工：
 
 | 维度 | Superpowers | feflow |
 |------|-------------|--------|
-| 定位 | 通用开发工作流 | 研发协作领域引擎 |
-| 能力 | brainstorming、planning、TDD、code-review | Item/Flow/Memory/Evidence 管理 |
-| 使用场景 | 通用开发任务 | 需求管理、版本规划、发布协调 |
+| 默认体验 | 通用强助手 | 前端研发治理层 |
+| 优势 | 直接做事、通用协作、通用 planning/review | Item/Memory/Evidence/Incident 治理 |
+| 适合场景 | 通用开发与编码任务 | 研发协作、复杂交付、事故治理、可追踪执行 |
 
-协作方式：feflow 的 hooks 在 Superpowers 工作流的关键节点注入领域逻辑。两者的 skills 和 agents 可互相调用。
+理想状态下：
+
+- 小任务体验要接近 Superpowers
+- 复杂任务治理能力要强于通用助手
+- 事故处理要比通用 planning 更快进入恢复路径
+
+## 当前改造方向
+
+v2 第一阶段重点不是“再加更多 flow”，而是先修正默认交互：
+
+1. 默认路由到 Assist / Delivery / Incident
+2. 不再把初始化和 Item 变成所有任务的硬前置
+3. 不再把内部治理术语暴露成用户负担
+4. 让 quality gate 变成“阻塞器”，不是“朗读器”
+5. 让 `scan` 和 `assist` 可以脱离 `.feflow/` 直接工作
 
 ## 方法论
 
-**总纲：做得对** -- 正确、完整、可追溯地完成每一项研发活动。
+**做得对** 仍然成立，但解释变了：
 
-六条设计口号：
-
-1. **放得活** -- 流程分级（L1/L2/L3），不一刀切
-2. **管得住** -- 可追踪、可核对、可恢复
-3. **记得住** -- 项目记忆外部化，跨会话持久
-4. **接得稳** -- AI 产出人类能接手
-5. **啃得动** -- 支持 legacy 和屎山
-6. **查得到** -- 证据驱动，有据可查
-
-## 路线图
-
-### V3 计划
-
-- [x] 多 Item 依赖与并行编排
-- [x] 记忆自动衰减与归档策略
-- [x] 流程模板自定义（用户自定义 Flow）
-- [x] 仪表盘：Item 状态全景视图
-- [x] 证据链可视化
-
-### 多平台支持
-
-- [x] Cursor 适配
-- [x] Windsurf 适配
-- [x] 其他 AI 编程助手适配（通用 AGENTS.md）
-
-## 贡献指南
-
-1. Fork 本仓库
-2. 创建特性分支：`git checkout -b feat/your-feature`
-3. 提交改动：`git commit -m "feat: 你的改动描述"`
-4. 推送分支：`git push origin feat/your-feature`
-5. 提交 Pull Request
-
-Commit 格式：`类型(范围): 描述`，类型包括 feat / fix / refactor / docs / test / chore。
+- **放得活**：流程要分层，不一刀切
+- **管得住**：真正高风险任务可追踪、可回滚
+- **记得住**：重要项目上下文可沉淀
+- **接得稳**：AI 产出要能让人接手
+- **啃得动**：旧仓库、脏仓库也能工作
+- **查得到**：证据在需要时可审计
 
 ## License
 

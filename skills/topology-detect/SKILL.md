@@ -1,55 +1,80 @@
 ---
 name: topology-detect
-description: 仓库拓扑识别。检测项目是单仓单应用/单仓多应用/monorepo，识别交付单元和依赖关系。
+description: 仓库拓扑识别。v2 中它用于明确交付边界和扫描范围，而不是只为初始化生成一个静态分类标签。
 ---
 
-# topology-detect：仓库拓扑识别
+# topology-detect：v2 仓库拓扑识别
+
+`topology-detect` 的目标是识别：
+
+1. 这是单应用、多应用还是 monorepo
+2. 实际交付单元有哪些
+3. 共享包、共享组件和应用边界在哪里
+4. 哪些边界会影响风险判断和扫描范围
 
 ## 触发条件
 
-- 由 `feflow:project-init` 在阶段一自动调用
-- 用户执行 `/feflow-topology` 或明确要求识别仓库结构
+- `project-init` 需要建立最小仓库画像
+- `repo-scan` 需要决定扫描深度和影响范围
+- 用户显式要求识别仓库结构
 
-## 检测内容
+## v2 原则
 
-### 1. 仓库形态（按优先级首个命中）
+1. 识别边界，服务执行。
+2. 不把拓扑识别变成只读标签收集。
+3. 结果应能指导后续 search、scan、delivery 风险判断。
 
-| 形态 | 判定条件 |
-|------|----------|
-| `monorepo` | 存在 `pnpm-workspace.yaml`/`lerna.json`/`nx.json`/`turbo.json`，或 `package.json` 含 `workspaces` |
-| `multi-app` | 无 workspace 配置，但 `apps/`/`packages/` 下有多个含 `package.json` 的子目录 |
-| `single-app` | 以上均不满足 |
+## 核心输出
 
-### 2. Workspace 工具
+### 仓库形态
 
-pnpm（`pnpm-workspace.yaml`）/ yarn（`workspaces`+`yarn.lock`）/ npm（`workspaces`+`package-lock.json`）/ turbo（`turbo.json`）/ nx（`nx.json`）/ lerna（`lerna.json`）。可同时存在多个。
+- `single-app`
+- `multi-app`
+- `monorepo`
+- `unknown`
 
-### 3. 交付单元
+### Workspace 工具
 
-扫描 workspace 声明的目录，记录：名称、路径、private、类型。类型推断：`apps/`→app | `packages/`+非private→lib | `shared/`/`common/`→shared | 其他→unknown。
+- pnpm / npm / yarn workspace
+- turbo / nx / lerna
 
-### 4. 共享依赖与发布边界
+### 交付单元
 
-- **共享依赖** — `workspace:` 协议引用 >= 2 次的内部包
-- **独立发布** — `private: false` 或含 `publishConfig`
-- **仅内部消费** — `private: true` 或仅被内部引用
-- **可部署应用** — 含 `build`/`start` script 且在 `apps/` 下
+识别：
 
-### 5. 影响图谱
+- apps
+- packages
+- shared
+- docs
+- tooling
 
-以交付单元为节点、内部依赖为有向边，输出改动扩散路径。
+### 共享边界
 
-## 产出
+识别这些高风险结构：
 
-写入 `init-config.md` 的 `workspace_shape` 字段：
+- 被多个应用依赖的内部包
+- 共享 UI / design system
+- 公共配置与构建脚本
+- 多应用共用的 API 层或基础设施
 
-包含：形态、workspace 工具、交付单元表（名称/路径/类型/发布）、共享依赖列表、影响图谱。
+## 输出要求
+
+最终输出应足够回答：
+
+1. 后续改动应该落在哪个交付单元
+2. 哪些包或目录的改动会外溢
+3. 哪些目录只是局部应用，哪些是共享基础设施
 
 ## 错误处理
 
-| 场景 | 处理 |
-|------|------|
-| 非 Node.js 项目 | 基于目录结构推断，标记「检测受限」|
-| workspace 配置语法错误 | 回退为 single-app |
-| 子包 package.json 缺失 | 跳过该目录，标记警告 |
-| 循环依赖 | 报告循环路径，不中断 |
+### workspace 配置有误
+
+降级为目录结构推断，不中止。
+
+### 非 Node.js 项目
+
+继续基于目录结构给出近似拓扑。
+
+### 子包信息不完整
+
+跳过损坏项，保留警告。

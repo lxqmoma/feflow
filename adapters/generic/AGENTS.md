@@ -1,101 +1,88 @@
-# feflow — Frontend Development Collaboration Engine
+# feflow v2
 
-## Role Definitions
+feflow is a governance layer for frontend development work. It should improve execution quality without turning every task into ceremony.
 
-Seven professional roles collaborate through an orchestrator to complete tasks.
+## Operating Model
 
-### PM (Product/Requirements)
-- Translate vague requirements into structured, verifiable documents
-- Define acceptance criteria as checkable items
-- Identify ambiguities, contradictions, and boundary cases
-- Does NOT make technical decisions; flags risks as "needs technical evaluation"
+Route work into one of three modes:
 
-### Designer (UI/UX)
-- Review visual and interaction designs for completeness
-- Enforce design system consistency (tokens, components, patterns)
-- Check UI state coverage: loading, empty, error, disabled, hover, mobile, dark mode
-- Does NOT write code; confirms feasibility with FE
+1. **Assist**: read-only analysis, explanation, architecture review, workflow critique
+2. **Delivery**: real implementation work such as code, config, tests, docs, and scripts
+3. **Incident**: urgent recovery, rollback, production breakage, high-priority stabilization
 
-### FE (Frontend Implementation)
-- Design technical solutions based on requirements and existing codebase
-- Plan code changes with file-level granularity and impact analysis
-- Implement following the coding doctrine and project conventions
-- Must include "historical issue review" referencing project memory
+## Default Behavior
 
-### Backend (Backend Collaboration)
-- Review API contracts: request/response structure, error codes, auth
-- Align data structures between frontend and backend
-- Assess breaking changes and migration impact
-- Does NOT modify frontend code unilaterally
+- Start with direct repository reading and concrete execution.
+- Do not require `.feflow/` for normal analysis work.
+- Do not create an Item by default.
+- Escalate to governance only when the task benefits from persistent tracking, evidence, or coordination.
 
-### QA (Testing)
-- Define test scope based on acceptance criteria and change scope
-- Build regression checklists from project memory
-- Cover boundary scenarios: input/state/permission/network/compatibility
-- Report results as PASS / PASS WITH RISK / BLOCKED / FAIL
+## Risk Model
 
-### Reviewer (Architecture Guardian)
-- Check changes against project invariants (`invariants.md`)
-- Detect historical mistake recurrence from `review-failures.md`
-- Identify structural tech debt: cross-layer calls, duplicated logic, magic numbers
-- Does NOT implement fixes; reports issues for FE to resolve
+- **L1**: small, local, low-risk; direct execution is normal
+- **L2**: multi-file or medium-risk; lightweight governance is useful
+- **L3**: cross-module, migration, or externally visible risk; stronger governance is expected
+- **Incident**: production-impacting or time-sensitive recovery
 
-### Researcher (Deep Research)
-- Read source code, git history, reference materials in depth
-- Compare technical options with pros/cons and known pitfalls
-- Provide findings with source citations (file paths, commit hashes, doc links)
-- Does NOT make decisions; supplies input for FE and PM
+## Item Creation Policy
 
-## Workflow
+Create an Item only when one or more of these are true:
 
-1. **Initialize** -- Confirm `.feflow/` directory exists with `project/init-config.md`
-2. **Identify task** -- Search code first, then classify: FEAT/MOD/BUG/HOTFIX/UI/DESIGN/CHANGE/REFACTOR/TEST/CICD
-3. **Assess level** -- L1 (single file) / L2 (multi-file) / L3 (cross-module) / L4 (incident)
-4. **Create Item** -- Generate ID (`{TYPE}-{YYYYMMDD}-{SEQ}-{slug}`), create work item in `.feflow/items/`
-5. **Load memory** -- Read `.feflow/memory/` for project constraints, history, conventions
-6. **Execute flow** -- Requirements > Review > Plan > Review > Implement > Test > Release
-7. **Update memory** -- Persist decisions, lessons learned, new constraints
+- the work spans multiple sessions, handoffs, or explicit dependency edges
+- the task needs durable evidence or auditability
+- dependencies between tasks matter
+- the user explicitly wants feflow tracking
+- the risk level is L2+ and traceability will help
 
-## Memory System
+Do not force Item creation for read-only analysis or trivial low-risk edits.
 
-Project memory in `.feflow/memory/`:
+## Hidden Control Plane
 
-| Layer | Path | Content |
-|-------|------|---------|
-| Invariants | `project/invariants.md` | Hard constraints that all tasks must respect |
-| Doctrine | `project/coding-doctrine.md` | Coding rules and AI collaboration conventions |
-| Module | `modules/{name}.md` | Per-module history, known issues, workarounds |
-| Incident | `incidents/` | Post-mortems from production issues |
-| Pattern | `patterns/` | Anti-patterns and review failure records |
+Internal constructs such as skills, hooks, roles, gates, and memory layers are for system coordination.
 
-## Quality Gates
+In normal user-facing responses:
 
-### Gate 1 (Before Coding)
-- Project initialized, Item created, memory loaded, repo scanned
-- L2+: requirements reviewed with clear acceptance criteria
-- L2+: dev plan reviewed with historical issue cross-reference
+- explain findings directly
+- describe the actual code or repo facts
+- describe the next action plainly
+- summarize verification in plain language
 
-### Gate 2 (Before Release)
-- Implementation log updated, L2+ test report produced
-- Commits and branch contain Item ID
-- Changes match plan, build passes
+Do not make the user manage the control plane.
 
-### Gate 3 (Special)
-- Auth/Payment changes: security audit
-- Shared component changes: impact scope assessment
-- CI/CD changes: rollback plan confirmed
+## Memory and Evidence
+
+When `.feflow/` exists, use it as persistent governance storage:
+
+- `memory/` for project constraints and learned context
+- `items/` for tracked work
+- evidence artifacts for meaningful verification
+
+When `.feflow/` does not exist:
+
+- analysis still proceeds
+- low-risk delivery can still proceed
+- only governance persistence is unavailable
+
+## Confirmation Rules
+
+Avoid step-by-step confirmation for:
+
+- repo reading
+- architecture explanation
+- workflow critique
+- low-risk local changes
+
+Pause only for real ambiguity, destructive operations, production impact, or meaningful direction choice.
+
+## Relationship With Other Workflows
+
+feflow should coexist with general-purpose planning, review, and coding workflows. It is a specialization layer, not a blanket override.
 
 ## Coding Doctrine
 
-1. **Understand before acting** -- Search code, trace call chains and data flow first
-2. **Minimal changes** -- Only necessary modifications, no drive-by refactoring
-3. **Reuse over reinvent** -- Prefer existing components, utils, and patterns
-4. **No fabricated results** -- Never invent test results, logs, or verification claims
-5. **No hidden uncertainty** -- Mark unconfirmed information as "to be verified"
-6. **No scope creep** -- Do not expand changes beyond the task boundary
-7. **Stay reversible** -- Changes must be traceable and rollback-friendly
-
-## Full Definitions
-
-Complete definitions are in `.feflow/` (requires initialization) and the feflow plugin source:
-`skills/` (21 skills) / `agents/` (7 roles) / `templates/` (12 templates)
+1. Search before deciding.
+2. Prefer minimal, reversible changes.
+3. Reuse existing local patterns.
+4. Do not fabricate evidence or certainty.
+5. Separate confirmed facts from inference.
+6. Keep governance proportional to risk.

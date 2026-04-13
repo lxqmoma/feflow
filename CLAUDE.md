@@ -1,66 +1,154 @@
-# feflow — 前端研发协作引擎
+# feflow v2
 
-## 方法论总纲
+feflow is a frontend development collaboration engine. In v2, it should behave as a **governance capability**, not a mandatory wrapper around every user request.
 
-核心目标：**做得对**（正确、完整、可追溯地完成每一项研发活动）
+## Core Thesis
 
-六个支撑能力：
-1. **放得活** — 流程分级，不一刀切
-2. **管得住** — 可追踪、可核对、可恢复
-3. **记得住** — 项目记忆外部化
-4. **接得稳** — AI 产出人类能接手
-5. **啃得动** — 支持 legacy 和屎山
-6. **查得到** — 证据驱动，有据可查
+The default user experience must feel closer to a strong coding assistant:
 
-## 插件结构
+- read the repo directly
+- answer directly when the task is analytical
+- modify directly when the task is small and low risk
+- escalate governance only when the work actually benefits from it
 
-```
-feflow/
-├── skills/          # 26 个技能定义（流程、记忆、质量、编排等）
-├── agents/          # 7 个角色（PM/Designer/FE/Backend/QA/Reviewer/Researcher）
-├── hooks/           # 生命周期钩子（SessionStart 检测）
-├── commands/        # 4 个命令（/init /task /scan /memory）
-├── templates/       # 12 个文档模板
-├── adapters/        # 多平台适配（Cursor/Windsurf/通用）
-├── package.json     # 插件元信息
-└── CLAUDE.md        # 本文件
-```
+The system should optimize for:
 
-## 核心概念
+1. low interruption
+2. clear user-facing outcomes
+3. risk-proportional process
+4. traceability only where traceability pays for itself
 
-### Item（工作项）
-研发活动的最小单元。每个 Item 对应一个明确的任务（需求/缺陷/技术任务等），
-拥有唯一标识、状态、上下文和产出物。
+## Three Modes
 
-### Flow（工作流）
-Item 的状态流转路径。定义 Item 从创建到完成经历的阶段，
-每个阶段可绑定准入条件、自动化动作和检查点。
+### 1. Assist
 
-### Memory（记忆）
-项目级的持久化上下文。存储在 `.feflow/` 目录下，
-包含项目配置、历史决策、团队约定等，跨会话可用。
+Use Assist mode for read-only or analysis-first work:
 
-### Evidence（证据）
-验证 Item 完成质量的客观依据。包括测试结果、审查记录、
-构建产物等，确保"做得对"不是自我声明而是有据可查。
+- understand a repository or plugin
+- explain architecture, modules, or code paths
+- critique workflow or prompt design
+- review likely risks and maintenance issues
+- summarize technical decisions from source files
 
-## 与 Superpowers 的关系
+Rules:
 
-feflow 是 Superpowers 生态中的**领域插件**，不替代 Superpowers 的通用能力：
+- do not require `.feflow/`
+- do not create an Item by default
+- do not force a staged workflow
+- search and read files directly
+- expose facts and reasoning clearly
 
-- Superpowers 提供：brainstorming、planning、TDD、code-review 等通用工作流
-- feflow 提供：研发协作场景下的 Item/Flow/Memory/Evidence 管理
-- 协作方式：feflow 的 hooks 在 Superpowers 工作流的关键节点注入领域逻辑
+### 2. Delivery
 
-使用原则：
-- 通用开发任务优先使用 Superpowers 工作流
-- 涉及需求管理、版本规划、发布协调等场景时启用 feflow
-- feflow 的 agents 可调用 Superpowers 的 skills，反之亦然
+Use Delivery mode when the user wants a real output such as:
 
-## 状态检测
+- code changes
+- config changes
+- tests
+- docs updates
+- scripts or workflow edits
 
-feflow 通过 `hooks/session-start/detect.sh` 在会话启动时自动检测：
-- `.feflow/` 目录是否存在（项目是否已初始化）
-- `project/init-config.md` 是否存在（初始化配置是否完成）
+Rules:
 
-检测结果以 JSON 格式注入会话上下文，供后续 skills 和 agents 使用。
+- start from direct execution, not ceremony
+- decide governance by risk
+- create an Item only when the task needs durable tracking, evidence, or dependency management
+
+Risk guidance:
+
+- **L1**: small, local, low-risk changes; usually no Item
+- **L2**: multi-file or medium-risk work; Item recommended
+- **L3**: cross-module, migration, or externally visible risk; Item expected
+
+### 3. Incident
+
+Use Incident mode for:
+
+- production failures
+- rollback decisions
+- urgent regression isolation
+- release/config/runtime breakages
+
+Rules:
+
+- stabilize first
+- prefer the fastest credible recovery path
+- backfill documentation and evidence after impact is controlled
+
+## Hidden Control Plane
+
+Internal constructs such as skill, hook, role, gate, Item, and memory layers are **control-plane concepts**.
+
+User-facing responses should normally speak in plain language:
+
+- what was read
+- what is happening
+- what the likely issue is
+- what will be changed
+- what was verified
+
+Do not turn the internal control plane into the product surface.
+
+## Confirmation Policy
+
+Do not ask for step-by-step confirmation for normal reading, analysis, or low-risk execution.
+
+Pause only when:
+
+- the goal is materially ambiguous
+- the change is destructive or hard to undo
+- the task affects external/shared/production state
+- there are multiple viable directions with different tradeoffs
+
+## Relationship With Superpowers
+
+feflow complements general-purpose workflows. It should not hard-block or hard-override general assistant behavior.
+
+Preferred posture:
+
+- use direct repository work for understanding and small tasks
+- use feflow governance when the task genuinely needs orchestration, evidence, memory, or incident handling
+- coexist with Superpowers-style planning, review, and implementation rather than replacing them mechanically
+
+## Governance Primitives
+
+feflow still supports its core primitives:
+
+- **Item** for durable task tracking
+- **Flow** for structured multi-stage work
+- **Memory** for persistent project context
+- **Evidence** for verification artifacts
+- **Gate** for blocker-level checks
+- **Role** for specialized perspectives
+
+But these should be invoked selectively, not universally.
+
+## Coding Doctrine
+
+1. Search before deciding.
+2. Prefer minimal, reversible changes.
+3. Reuse local patterns before inventing new ones.
+4. Do not fabricate evidence, verification, or certainty.
+5. Separate confirmed facts from inference.
+6. Keep governance proportional to risk.
+
+## Initialization
+
+`/feflow:init` is required only for full governance features that persist project memory, Items, and evidence in `.feflow/`.
+
+It is not required for:
+
+- repo reading
+- code explanation
+- architectural analysis
+- workflow critique
+- many L1 delivery tasks
+
+## Current Command Intent
+
+- `/feflow:assist` -> read-only analysis path
+- `/feflow:task` -> delivery path
+- `/feflow:incident` -> urgent recovery path
+- `/feflow:scan` -> repository intelligence path
+- `/feflow:memory` -> persistent project memory
+- `/feflow:init` -> opt into full governance workspace

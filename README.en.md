@@ -2,223 +2,149 @@
 
 # feflow
 
-Frontend development collaboration engine -- an AI coding assistant plugin that provides end-to-end development workflow management for frontend projects.
+Frontend development governance for coding assistants.
 
-Currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
+feflow v2 is built around one idea:
 
-## Highlights
+**the default experience should feel like a strong assistant, while governance should appear only when the task actually needs it.**
 
-- **Full lifecycle coverage** -- Requirements, design, development, testing, release: 10 task flows out of the box
-- **Multi-role collaboration** -- 7 professional roles (PM/Designer/FE/Backend/QA/Reviewer/Researcher), dispatched on demand by the orchestrator
-- **Project memory** -- 5-layer memory system (permanent/module/mid-term/event/short-term), persisted across sessions
-- **Repository awareness** -- 4-layer scanning to auto-detect tech stack, directory structure, and key configurations
-- **Evidence-driven** -- Test results, review records, and build artifacts serve as completion proof; no self-declarations
-- **Auto stack detection** -- Detects project tech stack and auto-installs corresponding skills
-- **Legacy support** -- Dedicated legacy overlay mode for tackling legacy codebases methodically
-- **Backfill mechanism** -- Supports retroactive evidence and context supplementation; no forced linear process
+## What feflow is for
 
-## Quick Start
+feflow focuses on gaps that appear in real frontend delivery work:
 
-### Installation
+- persistent project memory
+- durable task tracking
+- evidence-backed completion
+- incident and rollback handling
+- governance for cross-module and release-sensitive changes
 
-```bash
-# 1. Add marketplace
-claude plugins marketplace add lxqmoma/feflow
+It keeps those capabilities, but stops forcing them onto every request.
 
-# 2. Install plugin
-claude plugins install feflow@feflow-marketplace
-```
+## Three Modes
 
-### Initialization
+### Assist
 
-Restart Claude Code, then run in your project root:
+For read-only work:
 
-```
-/feflow:init
-```
+- repo understanding
+- architecture explanation
+- workflow critique
+- plugin evaluation
+- risk analysis
 
-This creates a `.feflow/` directory in your project for storing work items, memory, and configuration.
+No `.feflow/` workspace is required, and no Item should be created by default.
 
-### Usage
+### Delivery
 
-```
-# Create a task and start workflow
-/feflow:task Implement user login page
+For actual output:
 
-# View current work items
-/feflow:task list
+- code changes
+- config changes
+- tests
+- docs
+- scripts and workflow updates
 
-# Item status dashboard
-/feflow:task dashboard
+Governance depth is risk-based:
 
-# View evidence chain
-/feflow:task evidence FEAT-20260408-001
+- **L1**: usually direct execution
+- **L2**: lightweight governance helps
+- **L3**: stronger tracking and verification are expected
 
-# Scan repository status
-/feflow:scan
+### Incident
 
-# View project memory
-/feflow:memory
+For urgent failures:
 
-# Memory decay check
-/feflow:memory decay
-```
+- production incidents
+- hotfixes
+- rollback paths
+- release breakages
 
-## Core Concepts
-
-| Concept | Description |
-|---------|-------------|
-| **Item** | The smallest unit of development activity, with unique ID, state, context, and deliverables |
-| **Flow** | State transition path for an Item, defining phases, entry conditions, and checkpoints |
-| **Memory** | Project-level persistent context, storing decisions, conventions, and lessons across sessions |
-| **Evidence** | Objective proof of completion quality (test results, review records, etc.) |
-| **Gate** | Phase entry/exit checks ensuring process quality control |
-| **Role** | Professional role agent, dispatched by the orchestrator based on task type |
-
-## Plugin Structure
-
-```
-feflow/
-├── skills/            # 26 skill definitions
-│   ├── orchestrator/      # Task orchestration & dispatch
-│   ├── flow-feature/      # Feature development flow
-│   ├── flow-bugfix/       # Bug fix flow
-│   ├── flow-hotfix/       # Hotfix flow
-│   ├── flow-modification/ # Feature modification flow
-│   ├── flow-ui-optimize/  # UI optimization flow
-│   ├── flow-design/       # Design task flow
-│   ├── flow-change-request/ # Change request flow
-│   ├── flow-cicd/         # CI/CD flow
-│   ├── flow-refactor/     # Refactoring flow
-│   ├── flow-test-task/    # Test task flow
-│   ├── flow-legacy/       # Legacy overlay mode
-│   ├── repo-scan/         # Repository scanning
-│   ├── stack-detect/      # Tech stack detection
-│   ├── topology-detect/   # Topology detection
-│   ├── memory-load/       # Memory loading
-│   ├── memory-update/     # Memory updating
-│   ├── memory-decay/      # Memory decay & archival
-│   ├── project-init/      # Project initialization
-│   ├── quality-gate/      # Quality gate
-│   ├── evidence-ledger/   # Evidence ledger
-│   ├── evidence-chain/    # Evidence chain visualization
-│   ├── backfill/          # Evidence backfill
-│   ├── item-orchestration/ # Multi-Item dependency orchestration
-│   ├── custom-flow/       # Custom flow templates
-│   └── dashboard/         # Dashboard
-├── agents/            # 7 role agents
-│   ├── pm.md              # Product / Requirements
-│   ├── designer.md        # UI/UX Design
-│   ├── fe.md              # Frontend Implementation
-│   ├── backend.md         # Backend Collaboration
-│   ├── qa.md              # Testing / QA
-│   ├── reviewer.md        # Architecture Guardian
-│   └── researcher.md      # Deep Research
-├── commands/          # 4 commands
-│   ├── init.md            # /init -- Initialize workspace
-│   ├── task.md            # /task -- Create/view work items
-│   ├── scan.md            # /scan -- Scan repository
-│   └── memory.md          # /memory -- Manage memory
-├── templates/         # 12 document templates
-├── hooks/             # Lifecycle hooks
-├── package.json
-├── CLAUDE.md
-└── LICENSE
-```
+Stabilize first, backfill process artifacts later.
 
 ## Commands
 
-| Command | Description | Usage |
-|---------|-------------|-------|
-| `/feflow:init` | Initialize feflow workspace | `/feflow:init` |
-| `/feflow:task` | Create work item | `/feflow:task Implement login page` |
-| `/feflow:task list` | View all work items | `/feflow:task list` |
-| `/feflow:task dashboard` | Item status dashboard | `/feflow:task dashboard` |
-| `/feflow:task evidence` | View Item evidence chain | `/feflow:task evidence {ITEM-ID}` |
-| `/feflow:task deps` | View Item dependencies | `/feflow:task deps` |
-| `/feflow:scan` | Scan repository status | `/feflow:scan` |
-| `/feflow:memory` | View project memory | `/feflow:memory` |
-| `/feflow:memory add` | Add memory manually | `/feflow:memory add` |
-| `/feflow:memory decay` | Memory decay check | `/feflow:memory decay` |
+| Command | Purpose |
+|---------|---------|
+| `/feflow:assist` | Read-only analysis path |
+| `/feflow:task` | Delivery path |
+| `/feflow:incident` | Incident and hotfix path |
+| `/feflow:scan` | Repository intelligence |
+| `/feflow:init` | Initialize persistent governance workspace |
+| `/feflow:memory` | View or manage persistent project memory |
 
-## Flow Types
+## When Initialization Is Required
 
-| Flow | Use Case | Skill |
-|------|----------|-------|
-| Feature | New feature development | `flow-feature` |
-| Modification | Existing feature changes | `flow-modification` |
-| Bugfix | Bug fixes | `flow-bugfix` |
-| Hotfix | Urgent production fixes | `flow-hotfix` |
-| UI Optimize | UI/interaction improvements | `flow-ui-optimize` |
-| Design | Design-related tasks | `flow-design` |
-| Change Request | Change requests | `flow-change-request` |
-| CI/CD | Build and deployment tasks | `flow-cicd` |
-| Refactor | Code refactoring | `flow-refactor` |
-| Test Task | Testing tasks | `flow-test-task` |
-| Legacy (overlay) | Legacy codebase work, stackable on any flow | `flow-legacy` |
+Run `/feflow:init` only when you want full governance features such as:
 
-## Roles
+- persisted Items
+- project memory
+- evidence storage
+- dependency graphs and dashboards
 
-| Role | Responsibility | When Dispatched |
-|------|----------------|-----------------|
-| **PM** | Requirements analysis, documentation, ambiguity detection, acceptance criteria | Requirements phase |
-| **Designer** | UI visual design, UX interaction design | UI/DESIGN tasks, L3 tasks |
-| **FE** | Technical design, code change planning, module impact analysis, implementation | Development phase |
-| **Backend** | API integration, interface protocols, data structure adjustments | Cross-stack collaboration tasks |
-| **QA** | Test scope, regression checklist, edge cases, cross-platform verification | Testing phase |
-| **Reviewer** | Architecture guardian, invariant checks, preventing historical mistake recurrence | Code review, L3 tasks |
-| **Researcher** | Deep code reading, reference research, competitive analysis, commit history | On demand |
+Initialization is not required for:
 
-## Relationship with Superpowers
+- reading a repo
+- explaining code
+- critiquing architecture
+- evaluating a plugin
+- many L1 delivery tasks
 
-feflow is an independent plugin that can collaborate with [Superpowers](https://github.com/obra/superpowers):
+## Relationship With Superpowers
 
-| Dimension | Superpowers | feflow |
-|-----------|-------------|--------|
-| Positioning | General development workflow | Development collaboration engine |
-| Capabilities | Brainstorming, planning, TDD, code review | Item/Flow/Memory/Evidence management |
-| Use Cases | General development tasks | Requirements management, release planning, deployment coordination |
+feflow should complement, not mechanically override, general-purpose assistant workflows.
 
-Integration: feflow hooks inject domain logic at key points in Superpowers workflows. Skills and agents from both systems can call each other.
+The target shape is:
 
-## Methodology
+- small tasks feel as direct as Superpowers
+- complex tasks gain stronger governance than a generic assistant
+- incidents route into recovery faster than a generic plan-first workflow
 
-**Core principle: Get it right** -- Complete every development activity correctly, completely, and traceably.
+## Repository Layout
 
-Six design tenets:
+```text
+feflow/
+├── skills/
+├── agents/
+├── commands/
+├── adapters/
+├── hooks/
+├── scripts/
+├── templates/
+├── examples/
+├── README.md
+└── CLAUDE.md
+```
 
-1. **Stay flexible** -- Tiered processes (L1/L2/L3), no one-size-fits-all
-2. **Stay controlled** -- Trackable, verifiable, recoverable
-3. **Stay remembered** -- Externalized project memory, persistent across sessions
-4. **Stay handoff-ready** -- AI output that humans can pick up
-5. **Stay pragmatic** -- Legacy and messy codebases are first-class citizens
-6. **Stay provable** -- Evidence-driven, auditable
+## Example Workspace
 
-## Roadmap
+A minimal v2 workspace example is included so you can inspect what `.feflow` artifacts should look like under the new model:
 
-### V3 Plans
+- [`examples/minimal-v2-workspace/README.md`](./examples/minimal-v2-workspace/README.md)
 
-- [x] Multi-Item dependency and parallel orchestration
-- [x] Memory auto-decay and archival strategies
-- [x] Custom flow templates (user-defined Flows)
-- [x] Dashboard: Item status panoramic view
-- [x] Evidence chain visualization
+## Local Smoke Check
 
-### Multi-Platform Support
+The repository also includes a minimal smoke check so you can verify that the critical v2 entry points still exist and that obvious v1-style workflow language has not crept back into the core path:
 
-- [x] Cursor adapter
-- [x] Windsurf adapter
-- [x] Other AI coding assistant adapters (generic AGENTS.md)
+```bash
+./scripts/smoke-v2.sh
+```
 
-## Contributing
+## Dogfood Acceptance
 
-1. Fork this repository
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Commit changes: `git commit -m "feat: your change description"`
-4. Push the branch: `git push origin feat/your-feature`
-5. Open a Pull Request
+In addition to the static smoke check, the repo includes a behavior acceptance suite for manually validating `Assist / Delivery-L1 / Delivery-L3 / Incident` interactions against realistic prompts:
 
-Commit format: `type(scope): description`. Types: feat / fix / refactor / docs / test / chore.
+- [`V2-ACCEPTANCE-SUITE.md`](./V2-ACCEPTANCE-SUITE.md)
+
+## Principle
+
+feflow still stands for "get it right", but v2 interprets that in a risk-proportional way:
+
+- be flexible about process depth
+- stay traceable where traceability matters
+- preserve important memory
+- keep outputs handoff-ready
+- handle messy codebases pragmatically
+- require evidence only when evidence adds real value
 
 ## License
 
