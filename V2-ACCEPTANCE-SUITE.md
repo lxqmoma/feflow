@@ -62,6 +62,7 @@ Any scenario should be considered a **hard fail** if the assistant does one or m
 14. exposes internal skill names such as `superpowers:using-superpowers` or `feflow:project-init` in normal user-facing progress text
 15. claims file tools are unavailable even though the session metadata clearly exposes `Bash` / `Read` / `Write` / `Edit`
 16. when command dispatch already produced tool-backed evidence, still opens with future-tense narration such as “我先 … / I’ll …” instead of reporting inspected or changed results
+17. while handling `/feflow:*`, hands control to an unrelated external persona / workflow skill such as `pua:*` without an explicit user request
 
 ---
 

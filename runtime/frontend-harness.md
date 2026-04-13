@@ -31,6 +31,18 @@ Instead, begin with the task-facing action:
 
 This override exists because the user should experience one frontend lead, not the underlying substrate choreography.
 
+## External Skill Suppression
+
+When a `/feflow:*` command is already active, do not hand control to unrelated style, persona, or workflow skills unless the user explicitly asked for them in the same turn.
+
+In particular, suppress auto-invocation of skills such as:
+
+- `pua:*`
+- unrelated marketplace style/persona skills
+- extra workflow wrappers that are not needed to complete the active feflow command
+
+The command owner should remain `feflow`, not an accidental sidecar persona.
+
 ## Tool Availability Truth Source
 
 For feflow commands, the source of truth for tool availability is the current host session metadata.

@@ -215,6 +215,7 @@ printf 'END_FEFLOW_INIT_DISPATCH\n'
 - 不要再以“我先 / 我会 / 接下来初始化”作为主句
 - 不要把这次回复写成初始化思路说明
 - 首条用户可见文本必须直接基于 `BEGIN_FEFLOW_INIT_DISPATCH` 的结果汇报
+- 不要在这个命令里再调用无关的外部 persona / workflow skill，例如 `pua:*`
 - 如果 `created_*` 为 `none`，说明这是一次幂等校验或补全，不要假装刚刚新建了不存在的内容
 - 如果 `preserved_files` 不为 `none`，明确说明已有文件被保留、未覆盖
 - 先给结果，再给下一步建议

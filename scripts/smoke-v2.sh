@@ -223,6 +223,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q 'pua:\*|unrelated style, persona, or workflow skills|外部 persona / workflow skill' "runtime/frontend-harness.md" "commands/init.md" "commands/task.md" "V2-ACCEPTANCE-SUITE.md" || {
+    echo "external skill suppression guidance is missing" >&2
+    exit 1
+  }
+
   hook_output="$(CLAUDE_PLUGIN_ROOT=1 ./hooks/session-start/detect.sh)"
   printf '%s' "$hook_output" | rg -q 'hookSpecificOutput|additionalContext' || {
     echo "session-start hook did not emit Claude Code context payload" >&2
@@ -386,6 +391,11 @@ else
 
   grep -qE 'post-execution|post-dispatch|future-tense narration|完成态' "runtime/frontend-harness.md" "CLAUDE.md" "V2-ACCEPTANCE-SUITE.md" || {
     echo "post-dispatch visible reply guidance is missing" >&2
+    exit 1
+  }
+
+  grep -qE 'pua:\*|unrelated style, persona, or workflow skills|外部 persona / workflow skill' "runtime/frontend-harness.md" "commands/init.md" "commands/task.md" "V2-ACCEPTANCE-SUITE.md" || {
+    echo "external skill suppression guidance is missing" >&2
     exit 1
   }
 

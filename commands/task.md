@@ -114,6 +114,7 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 - 第一条用户可见文本必须引用已经检查到的文件面或边界
 - `dispatch_mode=delivery` 时，不要把这轮回复写成治理流程介绍
 - `dispatch_mode=list/dashboard/deps/evidence` 时，直接基于当前工作区继续，不要重讲 `/task` 的语义
+- 不要在这个命令里再调用无关的外部 persona / workflow skill，例如 `pua:*`
 - 如果接下来要继续用 `Read / Grep / Edit / Bash`，可以继续，但第一条文本必须已经带有检查后的事实
 
 ## 触发方式
