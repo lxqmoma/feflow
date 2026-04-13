@@ -145,6 +145,7 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 - 对普通源码、Markdown、JSON、配置文件使用 `Read` 时不要传 `pages`；`pages` 只用于 PDF 这类分页文档
 - L1 最终回复优先用一个短段落收束，除非用户要列表，否则不要展开成 bullet list
 - 如果 dispatch 已经打印出 `file_previews` 且已覆盖目标片段，优先基于这些预览继续 edit / verify，不要先对同一片段再发一次 `Read`
+- 如果这是单文件、单句、低风险的文案/Markdown/配置改动，而且 `file_previews` 已经给出了目标片段，优先走一次 `Bash` 的 read-modify-verify 闭环，不要先去触发最脆弱的首个 `Read`
 
 ## 触发方式
 
@@ -195,6 +196,7 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 5. 如果上方 dispatch 已经给出了检查结果，则第一条用户可见文本应使用完成态，而不是“我先 …”
 6. 对源码、配置、Markdown 文件调用 `Read` 时省略 `pages`；只有 PDF 这类分页文档才传 `pages`
 7. 如果 `file_previews` 已经包含目标文件的目标片段，优先直接编辑或做最小补充检查，不要先重复读取同一段
+8. 对单文件文案/Markdown/配置小改动，若 `file_previews` 已足够，优先使用 `Bash` 完成读取、替换和校验，再决定是否还需要 `Read`
 
 对于 L1：
 
