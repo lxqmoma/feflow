@@ -2,23 +2,7 @@
 description: 交付入口。用于真正要落地的研发任务；按风险决定是否创建 Item。
 disable-model-invocation: true
 shell: bash
-allowed-tools:
-  - Bash
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-hooks:
-  PreToolUse:
-    - matcher: "Skill"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard-feflow-skill.py pua:"
-  Stop:
-    - hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard-feflow-stop.py task"
+allowed-tools: Bash, Read, Write, Edit, Grep, Glob
 ---
 
 # /task
@@ -128,6 +112,8 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 - 不要输出 `★ Insight`
 - 不要套用“1. 改动概述 / 2. 修改原因 / 3. 影响范围 ...”这种审计模板
 - 如果接下来要继续用 `Read / Grep / Edit / Bash`，可以继续，但第一条文本必须已经带有检查后的事实
+- L1 任务默认直接用 `Bash / Read / Write / Edit / Grep / Glob` 推进，不要再绕去外部 skill 或待办流程
+- 如果需要补一句下一步，只保留一行，不要编号，不要展开多路线说明
 
 ## 触发方式
 

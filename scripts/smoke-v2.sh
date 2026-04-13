@@ -18,7 +18,10 @@ required_files=(
   "commands/memory.md"
   "commands/task.md"
   "commands/scan.md"
+  "hooks/hooks.json"
   "hooks/session-start/detect.sh"
+  "hooks/user-prompt/feflow-command-override.sh"
+  "scripts/feflow_hook_context.py"
   "scripts/guard-feflow-skill.py"
   "scripts/guard-feflow-stop.py"
   "skills/orchestrator/SKILL.md"
@@ -45,7 +48,13 @@ if [[ ! -x "hooks/session-start/detect.sh" ]]; then
   exit 1
 fi
 
+if [[ ! -x "hooks/user-prompt/feflow-command-override.sh" ]]; then
+  echo "hook is not executable: hooks/user-prompt/feflow-command-override.sh" >&2
+  exit 1
+fi
+
 bash -n "hooks/session-start/detect.sh"
+bash -n "hooks/user-prompt/feflow-command-override.sh"
 
 search_paths=(
   "README.md"
@@ -215,8 +224,8 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
-  rg -q 'guard-feflow-skill.py|guard-feflow-stop.py' "commands/init.md" "commands/task.md" || {
-    echo "command runtime guard hooks are missing" >&2
+  rg -q 'UserPromptSubmit|PreToolUse|Stop|guard-feflow-skill.py|guard-feflow-stop.py|feflow-command-override.sh' "hooks/hooks.json" || {
+    echo "plugin runtime guard hooks are missing" >&2
     exit 1
   }
 
@@ -245,6 +254,48 @@ if command -v rg >/dev/null 2>&1; then
     echo "session-start hook did not emit Claude Code context payload" >&2
     exit 1
   }
+
+  jq empty "hooks/hooks.json" >/dev/null 2>&1 || {
+    echo "hooks/hooks.json is not valid JSON" >&2
+    exit 1
+  }
+
+  user_prompt_output="$(printf '%s' '{"user_prompt":"/feflow:task test"}' | ./hooks/user-prompt/feflow-command-override.sh)"
+  printf '%s' "$user_prompt_output" | rg -q 'EXTREMELY_IMPORTANT|do not invoke `pua`|omit `pages`' || {
+    echo "user-prompt hook is missing feflow command override content" >&2
+    exit 1
+  }
+
+  tmp_transcript="$(mktemp)"
+  printf '%s\n' '{"type":"user","message":{"role":"user","content":"<command-name>/feflow:task</command-name>"}}' >"$tmp_transcript"
+
+  pretool_skill_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"pua\"}}" | python3 ./scripts/guard-feflow-skill.py)"
+  printf '%s' "$pretool_skill_output" | rg -q '"permissionDecision": ?"deny"|Do not invoke unrelated external persona/workflow skills' || {
+    rm -f "$tmp_transcript"
+    echo "pretool hook did not deny pua skill invocation inside feflow commands" >&2
+    exit 1
+  }
+
+  pretool_read_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"/tmp/README.md\",\"pages\":\"\"}}" | python3 ./scripts/guard-feflow-skill.py)"
+  printf '%s' "$pretool_read_output" | rg -q '"updatedInput"|Removed an empty `pages` argument' || {
+    rm -f "$tmp_transcript"
+    echo "pretool hook did not sanitize empty Read pages argument" >&2
+    exit 1
+  }
+  if printf '%s' "$pretool_read_output" | rg -q '"pages"'; then
+    rm -f "$tmp_transcript"
+    echo "pretool hook left an empty pages argument in updated Read input" >&2
+    exit 1
+  fi
+
+  stop_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"last_assistant_message\":\"★ Insight\\n1. 改动概述\\n2. 修改原因\"}" | python3 ./scripts/guard-feflow-stop.py)"
+  printf '%s' "$stop_output" | rg -q '"decision": ?"block"|operator-style' || {
+    rm -f "$tmp_transcript"
+    echo "stop hook did not block verbose feflow command output" >&2
+    exit 1
+  }
+
+  rm -f "$tmp_transcript"
 
   if rg -n '按阶段检查预期产出|完整度: 5/8|5/8 \\(62\\.5%\\)' "skills/evidence-chain/SKILL.md"; then
     echo "evidence-chain still contains rigid legacy completeness language" >&2
@@ -396,8 +447,8 @@ else
     exit 1
   }
 
-  grep -qE 'guard-feflow-skill.py|guard-feflow-stop.py' "commands/init.md" "commands/task.md" || {
-    echo "command runtime guard hooks are missing" >&2
+  grep -qE 'UserPromptSubmit|PreToolUse|Stop|guard-feflow-skill.py|guard-feflow-stop.py|feflow-command-override.sh' "hooks/hooks.json" || {
+    echo "plugin runtime guard hooks are missing" >&2
     exit 1
   }
 
@@ -426,6 +477,48 @@ else
     echo "session-start hook did not emit Claude Code context payload" >&2
     exit 1
   }
+
+  jq empty "hooks/hooks.json" >/dev/null 2>&1 || {
+    echo "hooks/hooks.json is not valid JSON" >&2
+    exit 1
+  }
+
+  user_prompt_output="$(printf '%s' '{"user_prompt":"/feflow:task test"}' | ./hooks/user-prompt/feflow-command-override.sh)"
+  printf '%s' "$user_prompt_output" | grep -qE 'EXTREMELY_IMPORTANT|do not invoke `pua`|omit `pages`' || {
+    echo "user-prompt hook is missing feflow command override content" >&2
+    exit 1
+  }
+
+  tmp_transcript="$(mktemp)"
+  printf '%s\n' '{"type":"user","message":{"role":"user","content":"<command-name>/feflow:task</command-name>"}}' >"$tmp_transcript"
+
+  pretool_skill_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"pua\"}}" | python3 ./scripts/guard-feflow-skill.py)"
+  printf '%s' "$pretool_skill_output" | grep -qE '"permissionDecision": ?"deny"|Do not invoke unrelated external persona/workflow skills' || {
+    rm -f "$tmp_transcript"
+    echo "pretool hook did not deny pua skill invocation inside feflow commands" >&2
+    exit 1
+  }
+
+  pretool_read_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"/tmp/README.md\",\"pages\":\"\"}}" | python3 ./scripts/guard-feflow-skill.py)"
+  printf '%s' "$pretool_read_output" | grep -qE '"updatedInput"|Removed an empty `pages` argument' || {
+    rm -f "$tmp_transcript"
+    echo "pretool hook did not sanitize empty Read pages argument" >&2
+    exit 1
+  }
+  if printf '%s' "$pretool_read_output" | grep -q '"pages"'; then
+    rm -f "$tmp_transcript"
+    echo "pretool hook left an empty pages argument in updated Read input" >&2
+    exit 1
+  fi
+
+  stop_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"last_assistant_message\":\"★ Insight\\n1. 改动概述\\n2. 修改原因\"}" | python3 ./scripts/guard-feflow-stop.py)"
+  printf '%s' "$stop_output" | grep -qE '"decision": ?"block"|operator-style' || {
+    rm -f "$tmp_transcript"
+    echo "stop hook did not block verbose feflow command output" >&2
+    exit 1
+  }
+
+  rm -f "$tmp_transcript"
 
   if grep -nE '按阶段检查预期产出|完整度: 5/8|5/8 \(62\.5%\)' "skills/evidence-chain/SKILL.md"; then
     echo "evidence-chain still contains rigid legacy completeness language" >&2

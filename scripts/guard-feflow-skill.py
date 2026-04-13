@@ -1,38 +1,99 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import sys
+from pathlib import Path
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR))
+
+from feflow_hook_context import detect_feflow_command  # noqa: E402
+
+
+BLOCKED_SKILL_PREFIXES = ("pua", "pua:")
+BLOCKED_READ_PATH_FRAGMENTS = (
+    "/pua-skills/pua/",
+    "/plugins/cache/pua-skills/",
+    "/plugins/marketplaces/pua-skills/",
+)
+
+
+def deny(message: str) -> int:
+    response = {
+        "hookSpecificOutput": {
+            "permissionDecision": "deny",
+        },
+        "systemMessage": message,
+    }
+    sys.stdout.write(json.dumps(response, ensure_ascii=False))
+    return 0
+
+
+def allow_with_updated_input(updated_input: dict[str, object], message: str) -> int:
+    response = {
+        "hookSpecificOutput": {
+            "permissionDecision": "allow",
+            "updatedInput": updated_input,
+        },
+        "systemMessage": message,
+    }
+    sys.stdout.write(json.dumps(response, ensure_ascii=False))
+    return 0
+
+
+def handle_skill(tool_input: dict[str, object]) -> int:
+    skill_name = str(tool_input.get("skill") or "")
+    if not any(skill_name == prefix or skill_name.startswith(prefix) for prefix in BLOCKED_SKILL_PREFIXES):
+        return 0
+
+    return deny(
+        "While handling `/feflow:*`, keep command ownership inside feflow. "
+        "Do not invoke unrelated external persona/workflow skills such as `pua:*`."
+    )
+
+
+def handle_read(tool_input: dict[str, object]) -> int:
+    file_path = str(tool_input.get("file_path") or "")
+    if any(fragment in file_path for fragment in BLOCKED_READ_PATH_FRAGMENTS):
+        return deny(
+            "While handling `/feflow:*`, do not read PUA persona materials. "
+            "Stay inside feflow and inspect the repo or target files directly."
+        )
+
+    pages = tool_input.get("pages")
+    if isinstance(pages, str) and not pages.strip():
+        updated_input = dict(tool_input)
+        updated_input.pop("pages", None)
+        return allow_with_updated_input(
+            updated_input,
+            "Removed an empty `pages` argument from `Read`. "
+            "Use `pages` only for page-oriented documents such as PDFs.",
+        )
+
+    return 0
 
 
 def main() -> int:
-    blocked_prefixes = [arg for arg in sys.argv[1:] if arg]
-    if not blocked_prefixes:
-        return 0
-
     try:
         payload = json.load(sys.stdin)
     except Exception:
         return 0
 
-    if payload.get("tool_name") != "Skill":
+    active_command = detect_feflow_command(payload)
+    if not active_command:
         return 0
 
-    tool_input = payload.get("tool_input") or {}
-    skill_name = tool_input.get("skill") or ""
-
-    if not any(skill_name.startswith(prefix) for prefix in blocked_prefixes):
+    tool_name = payload.get("tool_name")
+    tool_input = payload.get("tool_input")
+    if not isinstance(tool_input, dict):
         return 0
 
-    decision = {
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "deny",
-            "permissionDecisionReason": (
-                "While handling /feflow:* commands, keep command ownership inside feflow. "
-                "Do not invoke unrelated external persona/workflow skills such as pua:*."
-            ),
-        }
-    }
-    sys.stdout.write(json.dumps(decision, ensure_ascii=False))
+    if tool_name == "Skill":
+        return handle_skill(tool_input)
+    if tool_name == "Read":
+        return handle_read(tool_input)
     return 0
 
 

@@ -2,23 +2,7 @@
 description: 初始化 feflow 治理工作区。仅在需要持久化 Item、Memory、Evidence 时使用。
 disable-model-invocation: true
 shell: bash
-allowed-tools:
-  - Bash
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-hooks:
-  PreToolUse:
-    - matcher: "Skill"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard-feflow-skill.py pua:"
-  Stop:
-    - hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard-feflow-stop.py init"
+allowed-tools: Bash, Read, Write, Edit, Grep, Glob
 ---
 
 # /init
@@ -231,6 +215,8 @@ printf 'END_FEFLOW_INIT_DISPATCH\n'
 - 如果 `created_*` 为 `none`，说明这是一次幂等校验或补全，不要假装刚刚新建了不存在的内容
 - 如果 `preserved_files` 不为 `none`，明确说明已有文件被保留、未覆盖
 - 先给结果，再给下一步建议
+- 如果需要给后续建议，只保留一行，不要编号，不要列多条路线
+- 默认直接用 `Bash / Read / Write / Edit / Grep / Glob` 推进，不要再绕去外部 skill 或待办流程
 
 ## 触发方式
 
