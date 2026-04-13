@@ -195,6 +195,7 @@ For `Delivery-L2`:
 Do not say:
 
 - "I will call skill X"
+- "using superpowers:using-superpowers"
 - "the hook injected context"
 - "I am now in gate 1"
 - "PM agent will take over"

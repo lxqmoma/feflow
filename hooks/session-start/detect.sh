@@ -49,7 +49,7 @@ fi
 
 frontend_harness_escaped=$(escape_for_json "$frontend_harness_content")
 status_context_escaped=$(escape_for_json "[feflow:${status}] ${context}")
-session_context="<FEFLOW_FRONTEND_HARNESS>\n${frontend_harness_escaped}\n\nCurrent workspace state:\n${status_context_escaped}\n</FEFLOW_FRONTEND_HARNESS>"
+session_context="<EXTREMELY_IMPORTANT>\n${frontend_harness_escaped}\n\nCurrent workspace state:\n${status_context_escaped}\n</EXTREMELY_IMPORTANT>"
 
 if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
   printf '{\n  "additional_context": "%s"\n}\n' "$session_context"

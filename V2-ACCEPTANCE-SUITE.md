@@ -59,6 +59,7 @@ Any scenario should be considered a **hard fail** if the assistant does one or m
 11. asks for approval before a bounded, non-destructive `/feflow:init`
 12. opens normal feflow work by narrating external personas or skill names such as `pua` / `superpowers`
 13. claims files were created, checked, or validated without any tool-backed evidence
+14. exposes internal skill names such as `superpowers:using-superpowers` or `feflow:project-init` in normal user-facing progress text
 
 ---
 

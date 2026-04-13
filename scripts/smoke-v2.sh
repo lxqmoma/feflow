@@ -188,6 +188,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q 'do not echo `superpowers:using-superpowers`|Visibility Override' "runtime/frontend-harness.md" || {
+    echo "frontend harness is missing internal-skill visibility override" >&2
+    exit 1
+  }
+
   if rg -n '按阶段检查预期产出|完整度: 5/8|5/8 \\(62\\.5%\\)' "skills/evidence-chain/SKILL.md"; then
     echo "evidence-chain still contains rigid legacy completeness language" >&2
     exit 1
@@ -310,6 +315,11 @@ else
 
   grep -qE 'superpowers.*base execution discipline|default visible owner: FE|one visible owner' "runtime/frontend-harness.md" "V2-DESIGN-SPEC.md" "README.md" "skills/orchestrator/SKILL.md" || {
     echo "layered superpowers-first architecture is not fully encoded" >&2
+    exit 1
+  }
+
+  grep -qE 'do not echo `superpowers:using-superpowers`|Visibility Override' "runtime/frontend-harness.md" || {
+    echo "frontend harness is missing internal-skill visibility override" >&2
     exit 1
   }
 
