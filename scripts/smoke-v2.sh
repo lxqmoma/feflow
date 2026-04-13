@@ -9,9 +9,15 @@ required_files=(
   "README.md"
   "README.en.md"
   "V2-ACCEPTANCE-SUITE.md"
+  "DOGFOOD-ROUND-1-BASELINE.md"
+  "DOGFOOD-ROUND-1-WORKSHEET.md"
+  "DOGFOOD-GOLDEN-FIRST-REPLIES.md"
   "commands/assist.md"
   "commands/incident.md"
+  "commands/init.md"
+  "commands/memory.md"
   "commands/task.md"
+  "commands/scan.md"
   "hooks/session-start/detect.sh"
   "skills/orchestrator/SKILL.md"
   "skills/quality-gate/SKILL.md"
@@ -58,6 +64,7 @@ if command -v rg >/dev/null 2>&1; then
     echo "found banned legacy phrase(s)" >&2
     exit 1
   fi
+
 else
   if grep -RInE "$banned_regex" "${search_paths[@]}"; then
     echo "found banned legacy phrase(s)" >&2
@@ -76,7 +83,67 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
-  rg -q 'Scenario `A0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "V2-ACCEPTANCE-SUITE.md" || {
+  rg -q '## First Reply Contract' "CLAUDE.md" || {
+    echo "CLAUDE is missing first reply contract" >&2
+    exit 1
+  }
+
+  rg -q 'chat commands.*shell commands' "CLAUDE.md" || {
+    echo "CLAUDE is missing chat-command semantics" >&2
+    exit 1
+  }
+
+  rg -q '## Harness Engineering|behave like a \*\*harness\*\*|behave like a harness' "CLAUDE.md" || {
+    echo "CLAUDE is missing Harness Engineering guidance" >&2
+    exit 1
+  }
+
+  rg -q 'First Reply Contract' "adapters/generic/AGENTS.md" || {
+    echo "generic adapter is missing first reply contract" >&2
+    exit 1
+  }
+
+  rg -q '首轮回复契约' "adapters/cursor/rules.md" "adapters/windsurf/rules.md" || {
+    echo "host adapters are missing first reply contract guidance" >&2
+    exit 1
+  }
+
+  rg -q 'Scenario `A0`|Scenario `G0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "DOGFOOD-ROUND-1-WORKSHEET.md" || {
+    echo "dogfood worksheet is missing core scenarios" >&2
+    exit 1
+  }
+
+  rg -q 'A0|G0|D1|D3|I4' "DOGFOOD-ROUND-1-BASELINE.md" || {
+    echo "dogfood baseline is missing scenario coverage" >&2
+    exit 1
+  }
+
+  rg -q 'Scenario `A0`|Scenario `G0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "DOGFOOD-GOLDEN-FIRST-REPLIES.md" || {
+    echo "golden first replies are missing core scenarios" >&2
+    exit 1
+  }
+
+  rg -q '首轮回复契约' "commands/assist.md" "commands/task.md" "commands/incident.md" "commands/scan.md" "commands/init.md" "commands/memory.md" || {
+    echo "commands are missing first reply contract guidance" >&2
+    exit 1
+  }
+
+  rg -q '聊天命令，不是 shell 命令' "commands/init.md" "commands/memory.md" "commands/scan.md" || {
+    echo "core commands are missing chat-command semantics" >&2
+    exit 1
+  }
+
+  rg -q '默认\*\*不需要\*\*用户再确认一次' "commands/init.md" || {
+    echo "init command is missing zero-confirmation semantics" >&2
+    exit 1
+  }
+
+  rg -q '不应再被拆成“是否允许我初始化”的二次确认|初始化后的补充校准永远不阻塞最小工作区落地' "skills/project-init/SKILL.md" || {
+    echo "project-init skill is missing harness-style execution guidance" >&2
+    exit 1
+  }
+
+  rg -q 'Scenario `A0`|Scenario `G0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "V2-ACCEPTANCE-SUITE.md" || {
     echo "acceptance suite is missing core scenarios" >&2
     exit 1
   }
@@ -101,7 +168,67 @@ else
     exit 1
   }
 
-  grep -qE 'Scenario `A0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "V2-ACCEPTANCE-SUITE.md" || {
+  grep -q '## First Reply Contract' "CLAUDE.md" || {
+    echo "CLAUDE is missing first reply contract" >&2
+    exit 1
+  }
+
+  grep -qE 'chat commands.*shell commands' "CLAUDE.md" || {
+    echo "CLAUDE is missing chat-command semantics" >&2
+    exit 1
+  }
+
+  grep -qE '## Harness Engineering|behave like a \*\*harness\*\*|behave like a harness' "CLAUDE.md" || {
+    echo "CLAUDE is missing Harness Engineering guidance" >&2
+    exit 1
+  }
+
+  grep -q 'First Reply Contract' "adapters/generic/AGENTS.md" || {
+    echo "generic adapter is missing first reply contract" >&2
+    exit 1
+  }
+
+  grep -q '首轮回复契约' "adapters/cursor/rules.md" "adapters/windsurf/rules.md" || {
+    echo "host adapters are missing first reply contract guidance" >&2
+    exit 1
+  }
+
+  grep -qE 'Scenario `A0`|Scenario `G0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "DOGFOOD-ROUND-1-WORKSHEET.md" || {
+    echo "dogfood worksheet is missing core scenarios" >&2
+    exit 1
+  }
+
+  grep -qE 'A0|G0|D1|D3|I4' "DOGFOOD-ROUND-1-BASELINE.md" || {
+    echo "dogfood baseline is missing scenario coverage" >&2
+    exit 1
+  }
+
+  grep -qE 'Scenario `A0`|Scenario `G0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "DOGFOOD-GOLDEN-FIRST-REPLIES.md" || {
+    echo "golden first replies are missing core scenarios" >&2
+    exit 1
+  }
+
+  grep -q '首轮回复契约' "commands/assist.md" "commands/task.md" "commands/incident.md" "commands/scan.md" "commands/init.md" "commands/memory.md" || {
+    echo "commands are missing first reply contract guidance" >&2
+    exit 1
+  }
+
+  grep -q '聊天命令，不是 shell 命令' "commands/init.md" "commands/memory.md" "commands/scan.md" || {
+    echo "core commands are missing chat-command semantics" >&2
+    exit 1
+  }
+
+  grep -qF '默认**不需要**用户再确认一次' "commands/init.md" || {
+    echo "init command is missing zero-confirmation semantics" >&2
+    exit 1
+  }
+
+  grep -qE '不应再被拆成“是否允许我初始化”的二次确认|初始化后的补充校准永远不阻塞最小工作区落地' "skills/project-init/SKILL.md" || {
+    echo "project-init skill is missing harness-style execution guidance" >&2
+    exit 1
+  }
+
+  grep -qE 'Scenario `A0`|Scenario `G0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "V2-ACCEPTANCE-SUITE.md" || {
     echo "acceptance suite is missing core scenarios" >&2
     exit 1
   }

@@ -71,8 +71,100 @@ Avoid step-by-step confirmation for:
 - architecture explanation
 - workflow critique
 - low-risk local changes
+- bounded, non-destructive workspace initialization
 
 Pause only for real ambiguity, destructive operations, production impact, or meaningful direction choice.
+
+## Command And Harness Semantics
+
+Treat `/feflow:*` as chat-command intent, not shell input.
+
+- do not tell the user to run `! /feflow:init`
+- do not surface missing internal skill/router endpoints as the reason work cannot proceed
+- when `/feflow:init` is requested and file operations are available, create or repair the minimal workspace directly
+- ask at most one question only when existing `.feflow/` content would be overwritten or merged
+
+## First Reply Contract
+
+The first reply should lower interruption cost, not increase it.
+
+### Assist-like Requests
+
+When the user asks to understand a repo, plugin, architecture, or workflow:
+
+- say which concrete surfaces will be inspected
+- start reading immediately
+- do not ask the user to gather paths or file listings that can be discovered directly
+
+Preferred shape:
+
+- "I'll inspect the command surface, core routing rules, and the session hook first, then summarize the concrete design tradeoffs."
+
+Pause budget:
+
+- preferred: `0`
+- maximum acceptable: `1`
+
+### Low-Risk Delivery
+
+For small, local edits:
+
+- point to the likely file or module first
+- imply direct execution
+- avoid planning theater
+
+Preferred shape:
+
+- "I'll check the target file first, make the smallest reasonable change, then verify it."
+
+Pause budget:
+
+- preferred: `0`
+- maximum acceptable: `1`
+
+### High-Risk Delivery
+
+For auth, routing, SSR, shared state, payments, deploy surfaces, or cross-module work:
+
+- state why the task is risky
+- inspect the boundary first
+- pause at most once when scope or rollback risk genuinely needs alignment
+
+Preferred shape:
+
+- "This touches a high-risk boundary, so I'll inspect the relevant modules first and pause once only if the scope or rollback edge is unclear."
+
+Pause budget:
+
+- preferred: `1`
+- maximum acceptable: `2`
+
+### Incident / Recovery
+
+For hotfixes and production failures:
+
+- frame the likely blast radius
+- inspect the immediate recovery surface
+- optimize for the smallest credible stabilization path
+
+Preferred shape:
+
+- "I'll check the recent change surface and the failing boot path first, then choose the smallest safe recovery path."
+
+Pause budget:
+
+- preferred: `0` or `1`
+- maximum acceptable: `1`
+
+## Forbidden First Reply Patterns
+
+Do not open with:
+
+- "please initialize first"
+- "please confirm I may read files"
+- "phase complete, please approve"
+- explicit PM / FE / QA / reviewer handoff narration
+- a request for the user to perform trivial repo discovery the assistant can do itself
 
 ## Relationship With Other Workflows
 

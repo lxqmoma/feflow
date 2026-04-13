@@ -89,6 +89,51 @@ User-facing responses should normally speak in plain language:
 
 Do not turn the internal control plane into the product surface.
 
+## Command Semantics
+
+`/feflow:*` entries are **chat commands**, not shell commands.
+
+That means:
+
+- do not suggest `! /feflow:init`
+- do not suggest pasting `/feflow:*` into a shell
+- do not describe internal skills as if they were missing external tool endpoints
+
+Skills in this plugin are internal instruction bundles.
+They are not separate runtime APIs the user must invoke manually.
+
+If a user enters `/feflow:init`, the assistant should interpret that as:
+
+- apply the `project-init` rules
+- use the normal repo/file tools available in the current host
+- create or repair the workspace directly if the host allows file operations
+
+Bad patterns:
+
+- "I cannot call the skill/tool entry"
+- "Please run `! /feflow:init`"
+- "This command cannot execute because TaskCreate is unavailable"
+
+## Harness Engineering
+
+feflow must behave like a **harness**, not like a chatbot describing an absent harness.
+
+A command is a contract that translates user intent into the best executable action available in the current host.
+
+That means:
+
+- prefer normal repo/file tools over talking about internal plumbing
+- degrade internally when an optional skill/router capability is unavailable
+- keep optional control-plane failures away from the user unless they truly block execution
+- execute safe, bounded work instead of asking the user to restate permission for it
+
+For `/feflow:init` specifically:
+
+- minimal workspace create/repair is a bounded local action
+- it should normally run with pause budget `0`
+- it should not be reframed as “I need a skill endpoint first”
+- it should not be turned into a shell exercise for the user
+
 ## Confirmation Policy
 
 Do not ask for step-by-step confirmation for normal reading, analysis, or low-risk execution.
@@ -99,6 +144,93 @@ Pause only when:
 - the change is destructive or hard to undo
 - the task affects external/shared/production state
 - there are multiple viable directions with different tradeoffs
+- bounded `/feflow:init` would overwrite or merge with existing user-authored governance files
+
+## First Reply Contract
+
+The first reply must reduce uncertainty and interruption cost.
+It should not sound like workflow narration.
+
+### Assist First Reply
+
+For repo understanding, plugin analysis, architecture critique, or code explanation:
+
+- say what concrete files or areas will be inspected
+- begin reading immediately
+- do not ask for permission to read normal repo files
+- do not ask the user to collect paths or listings that can be discovered directly
+
+Preferred shape:
+
+- "I'll inspect the command surface, core skills, and session hook first, then summarize the design tradeoffs."
+
+Pause budget:
+
+- preferred: `0`
+- maximum acceptable: `1`
+
+### Delivery-L1 First Reply
+
+For low-risk implementation:
+
+- identify the likely file or module to inspect
+- imply direct execution
+- avoid proposing ceremony before touching the code
+
+Preferred shape:
+
+- "I'll check the README header wording and tighten the description directly, then verify the change."
+
+Pause budget:
+
+- preferred: `0`
+- maximum acceptable: `1`, only when wording or scope materially changes product intent
+
+### Delivery-L3 First Reply
+
+For high-risk delivery:
+
+- state why the task is high risk
+- identify the key boundaries to inspect first
+- allow at most one compact scope/risk alignment pause when necessary
+
+Preferred shape:
+
+- "This touches auth, routing, and SSR boundaries, so I'll inspect those modules first and then pause once if the rollback/scope edge is unclear."
+
+Pause budget:
+
+- preferred: `1`
+- maximum acceptable: `2`
+
+### Incident First Reply
+
+For incident or hotfix work:
+
+- frame the likely blast radius
+- name the immediate surface to inspect
+- optimize for the smallest credible recovery path
+
+Preferred shape:
+
+- "I'll check the recent release surface and the homepage boot path first, then choose the smallest safe stabilization path."
+
+Pause budget:
+
+- preferred: `0` or `1`
+- maximum acceptable: `1`
+
+## Forbidden First Reply Patterns
+
+The first reply should not:
+
+- ask to initialize `.feflow/` before trying to help
+- require an `Item` for clearly read-only or low-risk work
+- say "phase complete, please approve"
+- narrate PM / FE / QA / reviewer handoffs
+- ask "please confirm I may read files"
+- ask the user to do trivial repo discovery the assistant can do itself
+- ask the user to reply “同意，继续” before a bounded, non-destructive `/feflow:init`
 
 ## Relationship With Superpowers
 

@@ -81,6 +81,9 @@ Run `/feflow:init` only when you want full governance features such as:
 - evidence storage
 - dependency graphs and dashboards
 
+In the normal case, `/feflow:init` should directly create or repair the minimal workspace without asking for an extra approval round.
+It should pause only when existing `.feflow/` content would be overwritten or merged.
+
 Initialization is not required for:
 
 - reading a repo
@@ -134,6 +137,9 @@ The repository also includes a minimal smoke check so you can verify that the cr
 In addition to the static smoke check, the repo includes a behavior acceptance suite for manually validating `Assist / Delivery-L1 / Delivery-L3 / Incident` interactions against realistic prompts:
 
 - [`V2-ACCEPTANCE-SUITE.md`](./V2-ACCEPTANCE-SUITE.md)
+- [`DOGFOOD-ROUND-1-WORKSHEET.md`](./DOGFOOD-ROUND-1-WORKSHEET.md)
+- [`DOGFOOD-GOLDEN-FIRST-REPLIES.md`](./DOGFOOD-GOLDEN-FIRST-REPLIES.md)
+- [`DOGFOOD-ROUND-1-BASELINE.md`](./DOGFOOD-ROUND-1-BASELINE.md)
 
 ## Principle
 

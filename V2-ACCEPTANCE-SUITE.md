@@ -34,6 +34,12 @@ For each scenario:
 This suite is intentionally manual.
 The goal is to judge actual interaction quality, not only static wording.
 
+Companion assets:
+
+- `DOGFOOD-ROUND-1-WORKSHEET.md`
+- `DOGFOOD-GOLDEN-FIRST-REPLIES.md`
+- `DOGFOOD-ROUND-1-BASELINE.md`
+
 ---
 
 ## 3. Global Failure Signals
@@ -48,6 +54,9 @@ Any scenario should be considered a **hard fail** if the assistant does one or m
 6. claims conclusions without file or code evidence
 7. demands a full evidence bundle for low-risk work
 8. treats incident work like a normal multi-stage delivery workflow
+9. tells the user to run a `/feflow:*` chat command as a shell command
+10. claims a command cannot run merely because a named skill/tool entry is unavailable
+11. asks for approval before a bounded, non-destructive `/feflow:init`
 
 ---
 
@@ -56,6 +65,7 @@ Any scenario should be considered a **hard fail** if the assistant does one or m
 | ID | Scenario | Expected Route | Core Standard |
 |----|----------|----------------|---------------|
 | `A0` | Repo / plugin understanding | Assist | read first, answer directly |
+| `G0` | Workspace init | Governance bootstrap | create/repair minimal workspace directly |
 | `D1` | Low-risk local delivery | Delivery-L1 | implement directly |
 | `D3` | High-risk delivery | Delivery-L3 | brief alignment, tracked governance, no stage spam |
 | `I4` | Incident / hotfix | Incident | stabilize first |
@@ -120,7 +130,54 @@ Bad interaction shape:
 
 ---
 
-## 6. Scenario `D1` — Low-Risk Delivery
+## 6. Scenario `G0` — Workspace Init
+
+### Prompt
+
+```text
+/feflow:init
+```
+
+### Expected Route
+
+- `Governance bootstrap`
+- direct create/repair of minimal `.feflow/` workspace
+- no extra approval round for bounded local setup
+
+### Must Do
+
+1. interpret the slash command as chat-command intent, not shell input
+2. create or repair the minimal workspace directly when file operations are available
+3. use conservative defaults or `unknown` for missing metadata instead of blocking
+4. summarize what was created, repaired, or left unknown
+
+### Must Not Do
+
+1. ask the user to run `! /feflow:init`
+2. claim the command cannot run because a skill/tool entry is unavailable
+3. ask the user to reply “同意，继续” before safe bounded init
+4. turn init into a long repo interview or a full scan by default
+
+### Pause Budget
+
+- preferred: `0`
+- maximum acceptable: `1`, only if existing `.feflow/` files would be overwritten or merged
+
+### Pass Shape
+
+Good:
+
+- “我先直接把 `.feflow/` 最小工作区建起来或补齐缺失项；如果发现现有治理文件会被覆盖，我再停一次。”
+
+Bad:
+
+- “如果你同意，我再初始化”
+- “请在 shell 里执行 `! /feflow:init`”
+- “当前没有 skill/tool 入口，所以我不能真正执行”
+
+---
+
+## 7. Scenario `D1` — Low-Risk Delivery
 
 ### Prompt
 
@@ -173,7 +230,7 @@ Bad:
 
 ---
 
-## 7. Scenario `D3` — High-Risk Delivery
+## 8. Scenario `D3` — High-Risk Delivery
 
 ### Prompt
 
@@ -239,7 +296,7 @@ Bad:
 
 ---
 
-## 8. Scenario `I4` — Incident / Hotfix
+## 9. Scenario `I4` — Incident / Hotfix
 
 ### Prompt
 

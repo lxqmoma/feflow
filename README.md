@@ -145,6 +145,9 @@ claude plugins install feflow@feflow-marketplace
 - 证据沉淀
 - 依赖关系与仪表盘
 
+正常情况下，`/feflow:init` 应该直接创建或补齐最小工作区，不需要你再额外回一句“同意继续”。
+只有在已有 `.feflow/` 内容会被覆盖或合并时，才应该暂停确认。
+
 以下场景通常**不需要**初始化：
 
 - 读仓库
@@ -199,6 +202,9 @@ feflow/
 除了静态 smoke，仓库还提供了一份行为验收规范，用来人工回归 `Assist / Delivery-L1 / Delivery-L3 / Incident` 四类真实请求：
 
 - [`V2-ACCEPTANCE-SUITE.md`](./V2-ACCEPTANCE-SUITE.md)
+- [`DOGFOOD-ROUND-1-WORKSHEET.md`](./DOGFOOD-ROUND-1-WORKSHEET.md)
+- [`DOGFOOD-GOLDEN-FIRST-REPLIES.md`](./DOGFOOD-GOLDEN-FIRST-REPLIES.md)
+- [`DOGFOOD-ROUND-1-BASELINE.md`](./DOGFOOD-ROUND-1-BASELINE.md)
 
 ## 与 Superpowers 的关系
 
