@@ -31,6 +31,30 @@ Instead, begin with the task-facing action:
 
 This override exists because the user should experience one frontend lead, not the underlying substrate choreography.
 
+## Tool Availability Truth Source
+
+For feflow commands, the source of truth for tool availability is the current host session metadata.
+
+If the session exposes tools such as:
+
+- `Bash`
+- `Read`
+- `Write`
+- `Edit`
+- `Grep` / `Glob`
+
+then those tools are available for this turn.
+
+Do not say:
+
+- "当前没有可用的文件工具"
+- "宿主没有暴露文件工具"
+- "我这轮不能真正执行"
+
+when the session metadata already lists those tools.
+
+If tool use later fails, report the specific failing tool call or error instead of inventing a generic unavailability explanation.
+
 ## Role In The Stack
 
 Think in layers:
@@ -144,6 +168,33 @@ Default behavior:
 - frontend specialization beats generic ceremony
 - one visible owner beats multi-role theater
 - direct execution beats approval churn for bounded local work
+- if session metadata lists file tools, do not claim file tools are unavailable
+
+## Tool-First Dispatch
+
+For `/feflow:init` and `/feflow:task`, treat the command as an execution dispatch, not as a prompt for a planning monologue.
+
+### `/feflow:init`
+
+Preferred order:
+
+1. inspect whether `.feflow/` already exists
+2. create/repair minimal workspace with file tools
+3. read back the resulting structure or files
+4. then summarize
+
+Do not spend the whole turn explaining the command.
+
+### `/feflow:task`
+
+Preferred order:
+
+1. inspect the most relevant files or search surfaces first
+2. classify risk based on actual code boundaries
+3. for L1, continue directly into edit + verification
+4. for L2/L3, give one compact risk note and keep moving
+
+Do not start `/feflow:task` with governance narration when file inspection can begin immediately.
 
 ## Evidence Discipline
 

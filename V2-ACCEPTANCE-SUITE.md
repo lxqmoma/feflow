@@ -60,6 +60,7 @@ Any scenario should be considered a **hard fail** if the assistant does one or m
 12. opens normal feflow work by narrating external personas or skill names such as `pua` / `superpowers`
 13. claims files were created, checked, or validated without any tool-backed evidence
 14. exposes internal skill names such as `superpowers:using-superpowers` or `feflow:project-init` in normal user-facing progress text
+15. claims file tools are unavailable even though the session metadata clearly exposes `Bash` / `Read` / `Write` / `Edit`
 
 ---
 
@@ -176,6 +177,7 @@ Good:
 - “我先直接把 `.feflow/` 最小工作区建起来或补齐缺失项；如果发现现有治理文件会被覆盖，我再停一次。”
 - and then it actually creates or repairs the workspace in that same turn
 - even in hosts where slash commands often end after one assistant turn, it still gets the file work done before stopping
+- when the session already exposes file tools, it uses them instead of claiming they are missing
 
 Bad:
 

@@ -193,6 +193,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q 'If the session exposes tools such as|do not claim file tools are unavailable' "runtime/frontend-harness.md" "commands/init.md" "commands/task.md" || {
+    echo "tool-availability truth-source guidance is missing" >&2
+    exit 1
+  }
+
   hook_output="$(CLAUDE_PLUGIN_ROOT=1 ./hooks/session-start/detect.sh)"
   printf '%s' "$hook_output" | rg -q 'hookSpecificOutput|additionalContext' || {
     echo "session-start hook did not emit Claude Code context payload" >&2
@@ -326,6 +331,11 @@ else
 
   grep -qE 'do not echo `superpowers:using-superpowers`|Visibility Override' "runtime/frontend-harness.md" || {
     echo "frontend harness is missing internal-skill visibility override" >&2
+    exit 1
+  }
+
+  grep -qE 'If the session exposes tools such as|do not claim file tools are unavailable' "runtime/frontend-harness.md" "commands/init.md" "commands/task.md" || {
+    echo "tool-availability truth-source guidance is missing" >&2
     exit 1
   }
 

@@ -50,9 +50,11 @@ description: 初始化 feflow 治理工作区。仅在需要持久化 Item、Mem
 - 不要把 “TaskCreate / tool entry 不存在” 当成初始化失败原因
 - 当前宿主有文件写入能力时，直接执行
 - 在 Claude Code 这类带 `Bash / Write / Edit / Read` 的宿主里，先调用工具再讲长解释
+- 如果当前会话元数据里已经列出了 `Bash / Read / Write / Edit`，不要再声称“没有可用文件工具”
 - 当前宿主确实没有文件写入能力时，简短说明宿主限制，并给出可直接落盘的补丁或文件结果
 - 当前宿主有文件工具时，不要在只输出一段“我先去做”之后直接结束当前回合
 - 不要要求用户“再发一次 `/feflow:init`”来触发真正执行
+- 不要在用户可见文本里说“使用 superpowers:using-superpowers”或“使用 feflow:project-init”
 
 ## 行为边界
 
@@ -119,6 +121,7 @@ description: 初始化 feflow 治理工作区。仅在需要持久化 Item、Mem
 
 如果宿主有文件操作能力，则首轮回复之后必须在**同一回合**继续完成真实创建/修复，再结束回复。
 如果宿主是 Claude Code 一类会在 slash command 后直接 `end_turn` 的环境，则要把工具执行放在优先级高于铺陈的位置。
+如果当前会话已经列出 `Bash / Read / Write / Edit`，则应把“工具可用”视为已知事实，而不是待猜测前提。
 
 推荐形态：
 
@@ -133,6 +136,8 @@ description: 初始化 feflow 治理工作区。仅在需要持久化 Item、Mem
 - “如果你同意，我再开始初始化”
 - “我先说明一下初始化思路，下一条再真正执行”
 - “请你再发一次 `/feflow:init`，我就开始真正落盘”
+- “使用 superpowers:using-superpowers 和 feflow:project-init ...”
+- “当前没有可用文件工具，所以我先给你一份方案”
 
 暂停预算：
 
