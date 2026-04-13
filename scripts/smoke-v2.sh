@@ -193,6 +193,12 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  hook_output="$(CLAUDE_PLUGIN_ROOT=1 ./hooks/session-start/detect.sh)"
+  printf '%s' "$hook_output" | rg -q 'hookSpecificOutput|additionalContext' || {
+    echo "session-start hook did not emit Claude Code context payload" >&2
+    exit 1
+  }
+
   if rg -n '按阶段检查预期产出|完整度: 5/8|5/8 \\(62\\.5%\\)' "skills/evidence-chain/SKILL.md"; then
     echo "evidence-chain still contains rigid legacy completeness language" >&2
     exit 1
@@ -320,6 +326,12 @@ else
 
   grep -qE 'do not echo `superpowers:using-superpowers`|Visibility Override' "runtime/frontend-harness.md" || {
     echo "frontend harness is missing internal-skill visibility override" >&2
+    exit 1
+  }
+
+  hook_output="$(CLAUDE_PLUGIN_ROOT=1 ./hooks/session-start/detect.sh)"
+  printf '%s' "$hook_output" | grep -qE 'hookSpecificOutput|additionalContext' || {
+    echo "session-start hook did not emit Claude Code context payload" >&2
     exit 1
   }
 
