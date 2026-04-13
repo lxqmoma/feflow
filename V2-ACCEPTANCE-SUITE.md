@@ -149,7 +149,8 @@ Bad interaction shape:
 1. interpret the slash command as chat-command intent, not shell input
 2. create or repair the minimal workspace directly when file operations are available
 3. use conservative defaults or `unknown` for missing metadata instead of blocking
-4. summarize what was created, repaired, or left unknown
+4. complete at least one real create/repair action in the same turn when tools are available
+5. summarize what was created, repaired, or left unknown
 
 ### Must Not Do
 
@@ -157,6 +158,8 @@ Bad interaction shape:
 2. claim the command cannot run because a skill/tool entry is unavailable
 3. ask the user to reply “同意，继续” before safe bounded init
 4. turn init into a long repo interview or a full scan by default
+5. end the turn after only describing intent without actually creating or repairing anything
+6. ask the user to resend `/feflow:init` to trigger the real work
 
 ### Pause Budget
 
@@ -168,12 +171,15 @@ Bad interaction shape:
 Good:
 
 - “我先直接把 `.feflow/` 最小工作区建起来或补齐缺失项；如果发现现有治理文件会被覆盖，我再停一次。”
+- and then it actually creates or repairs the workspace in that same turn
 
 Bad:
 
 - “如果你同意，我再初始化”
 - “请在 shell 里执行 `! /feflow:init`”
 - “当前没有 skill/tool 入口，所以我不能真正执行”
+- “我先说明一下，下一条再真正执行”
+- “请你再发一次 `/feflow:init`”
 
 ---
 

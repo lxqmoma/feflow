@@ -95,6 +95,7 @@ Each golden should feel:
 - implies direct local action
 - keeps pause budget at zero for safe bounded init
 - avoids exposing internal skill/router plumbing
+- closes the loop in the same turn instead of ending after a promise
 
 ### Common Fails
 
@@ -102,6 +103,8 @@ Each golden should feel:
 - “回复：同意，继续”
 - “请在 shell 里运行 `! /feflow:init`”
 - “缺少 skill/tool 入口，所以我不能真正执行”
+- “我先讲一下初始化思路，下一条再做”
+- “请你再发一次 `/feflow:init`”
 
 ---
 

@@ -79,7 +79,7 @@ Most likely failure shape:
 
 ### `G0` — Workspace Init
 
-**Predicted score:** `8/10`
+**Predicted score:** `7/10`
 
 Why it should mostly pass:
 
@@ -90,12 +90,13 @@ Why it should mostly pass:
 Residual risk:
 
 - some hosts may still over-literalize “skill” language and expose backend plumbing
-- some conservative runtimes may still ask one extra permission question before file creation
+- some runtimes may produce a correct first sentence but still end the turn before any real file creation happens
 
 Most likely failure shape:
 
 - explaining why init cannot run instead of simply running it
 - asking for an unnecessary “同意继续”
+- sounding correct on the first line but failing to actually create `.feflow/` in the same turn
 
 ### `D1` — Low-Risk Delivery
 

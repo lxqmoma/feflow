@@ -126,6 +126,7 @@ That means:
 - degrade internally when an optional skill/router capability is unavailable
 - keep optional control-plane failures away from the user unless they truly block execution
 - execute safe, bounded work instead of asking the user to restate permission for it
+- close safe, bounded commands in the same turn when the host already exposes the needed tools
 
 For `/feflow:init` specifically:
 
@@ -133,6 +134,8 @@ For `/feflow:init` specifically:
 - it should normally run with pause budget `0`
 - it should not be reframed as “I need a skill endpoint first”
 - it should not be turned into a shell exercise for the user
+- it should not end the turn after an intention-only first reply
+- it should not ask the user to resend `/feflow:init` just to trigger real execution
 
 ## Confirmation Policy
 

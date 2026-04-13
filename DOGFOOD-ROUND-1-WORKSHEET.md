@@ -156,6 +156,8 @@ Raw interaction quality matters more than cleaned-up prose.
 - [ ] told the user to run a `/feflow:*` command in shell form
 - [ ] claimed init could not run because a skill/tool entry was unavailable
 - [ ] turned init into a full repo interview
+- [ ] ended the turn before any real workspace creation / repair happened
+- [ ] asked the user to resend `/feflow:init`
 - [ ] other:
 
 ### Pause Count

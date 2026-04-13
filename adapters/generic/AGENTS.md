@@ -82,6 +82,8 @@ Treat `/feflow:*` as chat-command intent, not shell input.
 - do not tell the user to run `! /feflow:init`
 - do not surface missing internal skill/router endpoints as the reason work cannot proceed
 - when `/feflow:init` is requested and file operations are available, create or repair the minimal workspace directly
+- when `/feflow:init` starts, do not stop after an intention-only first reply; complete the create/repair work in the same turn
+- do not ask the user to resend the same slash command to trigger actual execution
 - ask at most one question only when existing `.feflow/` content would be overwritten or merged
 
 ## First Reply Contract

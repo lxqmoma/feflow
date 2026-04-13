@@ -138,6 +138,16 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q '当前这一回合|同一回合' "commands/init.md" "skills/project-init/SKILL.md" "CLAUDE.md" || {
+    echo "init flow is missing same-turn execution semantics" >&2
+    exit 1
+  }
+
+  rg -q '再发一次 `/feflow:init`|再次发送 `/init` 或 `/feflow:init`' "commands/init.md" "skills/project-init/SKILL.md" "DOGFOOD-GOLDEN-FIRST-REPLIES.md" || {
+    echo "init flow is missing anti-repeat-command guidance" >&2
+    exit 1
+  }
+
   rg -q '不应再被拆成“是否允许我初始化”的二次确认|初始化后的补充校准永远不阻塞最小工作区落地' "skills/project-init/SKILL.md" || {
     echo "project-init skill is missing harness-style execution guidance" >&2
     exit 1
@@ -220,6 +230,16 @@ else
 
   grep -qF '默认**不需要**用户再确认一次' "commands/init.md" || {
     echo "init command is missing zero-confirmation semantics" >&2
+    exit 1
+  }
+
+  grep -qE '当前这一回合|同一回合' "commands/init.md" "skills/project-init/SKILL.md" "CLAUDE.md" || {
+    echo "init flow is missing same-turn execution semantics" >&2
+    exit 1
+  }
+
+  grep -qE '再发一次 `/feflow:init`|再次发送 `/init` 或 `/feflow:init`' "commands/init.md" "skills/project-init/SKILL.md" "DOGFOOD-GOLDEN-FIRST-REPLIES.md" || {
+    echo "init flow is missing anti-repeat-command guidance" >&2
     exit 1
   }
 
