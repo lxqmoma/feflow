@@ -93,6 +93,34 @@ if [ "$dispatch_mode" = "delivery" ] && [ -n "$trimmed_input" ]; then
   else
     printf 'rg-missing\n'
   fi
+
+  printf 'file_previews:\n'
+  if command -v rg >/dev/null 2>&1; then
+    printf '%s\n' "$trimmed_input" \
+      | tr '[:space:]/:_-' '\n' \
+      | sed 's/[^[:alnum:]]//g' \
+      | sed '/^$/d' \
+      | grep -E '.{3,}' \
+      | sort -fu \
+      | sed -n '1,5p' \
+      | while read -r token; do
+          rg --files . | sed 's#^\./##' | rg -i --fixed-strings "$token" || true
+        done \
+      | perl -ne 'print if !$seen{$_}++' \
+      | sed -n '1,3p' \
+      | while read -r preview_file; do
+          if [ ! -f "$preview_file" ]; then
+            continue
+          fi
+          if ! LC_ALL=C grep -Iq . "$preview_file"; then
+            continue
+          fi
+          printf -- '--- %s ---\n' "$preview_file"
+          nl -ba "$preview_file" | sed -n '1,20p'
+        done
+  else
+    printf 'preview-unavailable\n'
+  fi
 fi
 
 printf 'END_FEFLOW_TASK_DISPATCH\n'
@@ -116,6 +144,7 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 - 如果需要补一句下一步，只保留一行，不要编号，不要展开多路线说明
 - 对普通源码、Markdown、JSON、配置文件使用 `Read` 时不要传 `pages`；`pages` 只用于 PDF 这类分页文档
 - L1 最终回复优先用一个短段落收束，除非用户要列表，否则不要展开成 bullet list
+- 如果 dispatch 已经打印出 `file_previews` 且已覆盖目标片段，优先基于这些预览继续 edit / verify，不要先对同一片段再发一次 `Read`
 
 ## 触发方式
 
@@ -165,6 +194,7 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 4. 不要声称“当前没有可用文件工具”，除非具体工具调用已经返回失败
 5. 如果上方 dispatch 已经给出了检查结果，则第一条用户可见文本应使用完成态，而不是“我先 …”
 6. 对源码、配置、Markdown 文件调用 `Read` 时省略 `pages`；只有 PDF 这类分页文档才传 `pages`
+7. 如果 `file_previews` 已经包含目标文件的目标片段，优先直接编辑或做最小补充检查，不要先重复读取同一段
 
 对于 L1：
 
