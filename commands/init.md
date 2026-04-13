@@ -1,10 +1,222 @@
 ---
 description: 初始化 feflow 治理工作区。仅在需要持久化 Item、Memory、Evidence 时使用。
+disable-model-invocation: true
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
 ---
 
 # /init
 
 为当前项目开启最小可用的 feflow 治理工作区。
+
+```!
+set -euo pipefail
+
+render_list() {
+  if [ "$#" -eq 0 ]; then
+    printf 'none'
+  else
+    local IFS=', '
+    printf '%s' "$*"
+  fi
+}
+
+project_root="$(pwd)"
+today="$(date +%F)"
+in_git_repo="false"
+
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  in_git_repo="true"
+fi
+
+package_manager="unknown"
+if [ -f pnpm-lock.yaml ]; then
+  package_manager="pnpm"
+elif [ -f package-lock.json ]; then
+  package_manager="npm"
+elif [ -f yarn.lock ]; then
+  package_manager="yarn"
+elif [ -f bun.lockb ] || [ -f bun.lock ]; then
+  package_manager="bun"
+fi
+
+framework="unknown"
+if ls nuxt.config.* >/dev/null 2>&1; then
+  framework="Nuxt"
+elif [ -f package.json ] && grep -qi '"vue"' package.json; then
+  if ls vite.config.* >/dev/null 2>&1; then
+    framework="Vue 3 + Vite"
+  else
+    framework="Vue"
+  fi
+fi
+
+language="unknown"
+if [ -f tsconfig.json ] || find . -maxdepth 2 -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.vue' \) | grep -q .; then
+  language="TypeScript"
+elif find . -maxdepth 2 -type f \( -name '*.js' -o -name '*.jsx' \) | grep -q .; then
+  language="JavaScript"
+fi
+
+project_type="unknown"
+if [ -f package.json ]; then
+  project_type="frontend-web"
+fi
+
+created_dirs=()
+for dir in \
+  .feflow \
+  .feflow/project \
+  .feflow/items \
+  .feflow/memory \
+  .feflow/memory/project \
+  .feflow/templates
+do
+  if [ ! -d "$dir" ]; then
+    mkdir -p "$dir"
+    created_dirs+=("$dir")
+  fi
+done
+
+created_files=()
+preserved_files=()
+
+write_if_missing() {
+  local path="$1"
+  shift
+  if [ -e "$path" ]; then
+    preserved_files+=("$path")
+    cat >/dev/null
+    return
+  fi
+  cat >"$path"
+  created_files+=("$path")
+}
+
+write_if_missing .feflow/project/init-config.md <<EOF
+---
+name: init-config
+version: 0.1
+status: active
+initialized_at: $today
+workspace_mode: minimal
+---
+
+# 项目初始化配置
+
+## 基本信息
+- project_root: .
+- project_type: $project_type
+- package_manager: $package_manager
+- framework: $framework
+- language: $language
+- in_git_repo: $in_git_repo
+
+## 当前能力
+- items: enabled
+- project_memory: enabled
+- templates: enabled
+- repo_scan: not_started
+
+## 初始化策略
+- overwrite_existing_files: false
+- fill_unknown_with_placeholder: true
+- conservative_defaults: true
+
+## 待后续补充
+- app_mode: unknown
+- deployment_model: unknown
+- test_strategy: unknown
+EOF
+
+write_if_missing .feflow/memory/project/invariants.md <<EOF
+---
+name: project-invariants
+type: project-memory
+status: active
+updated_at: $today
+---
+
+# 项目不变量
+
+## 已确认
+- 当前目录已启用最小 feflow 治理工作区
+- 项目类型: $project_type
+- 包管理器: $package_manager
+- 框架: $framework
+- 语言: $language
+
+## 暂未确认
+- app_mode: unknown
+- deployment_model: unknown
+- test_strategy: unknown
+
+## 使用原则
+- 未确认的信息一律保持为 unknown
+- 后续结论优先基于代码和验证更新
+- 不以猜测替代项目事实
+EOF
+
+write_if_missing .feflow/memory/project/coding-doctrine.md <<EOF
+---
+name: coding-doctrine
+type: project-memory
+status: active
+updated_at: $today
+---
+
+# 编码原则
+
+## 默认原则
+- 优先正确性、安全性、可维护性、可回滚性
+- 优先最小必要修改
+- 优先复用现有实现与现有模式
+- 未验证的信息不得当作事实
+
+## 执行原则
+- 修改前先理解调用链、数据流和边界条件
+- 优先修根因，不做脆弱补丁
+- 非必要不改接口、目录结构、配置和依赖
+- 修改后至少做最小必要验证
+
+## 治理原则
+- 先建立抓手，再逐步补全上下文
+- 事实、决策、证据分层沉淀
+- 治理文档先保守、再迭代，不一次性写满
+EOF
+
+printf 'BEGIN_FEFLOW_INIT_DISPATCH\n'
+printf 'project_root=%s\n' "$project_root"
+printf 'project_type=%s\n' "$project_type"
+printf 'in_git_repo=%s\n' "$in_git_repo"
+printf 'package_manager=%s\n' "$package_manager"
+printf 'framework=%s\n' "$framework"
+printf 'language=%s\n' "$language"
+printf 'created_dirs=%s\n' "$(render_list "${created_dirs[@]}")"
+printf 'created_files=%s\n' "$(render_list "${created_files[@]}")"
+printf 'preserved_files=%s\n' "$(render_list "${preserved_files[@]}")"
+printf 'workspace_tree:\n'
+find .feflow -maxdepth 3 | sort
+printf 'END_FEFLOW_INIT_DISPATCH\n'
+```
+
+## Dispatch 约束
+
+上面的 init dispatch 已在你生成回复之前执行。
+
+因此：
+
+- 不要再以“我先 / 我会 / 接下来初始化”作为主句
+- 不要把这次回复写成初始化思路说明
+- 首条用户可见文本必须直接基于 `BEGIN_FEFLOW_INIT_DISPATCH` 的结果汇报
+- 如果 `created_*` 为 `none`，说明这是一次幂等校验或补全，不要假装刚刚新建了不存在的内容
+- 如果 `preserved_files` 不为 `none`，明确说明已有文件被保留、未覆盖
+- 先给结果，再给下一步建议
 
 ## 触发方式
 
@@ -115,20 +327,23 @@ description: 初始化 feflow 治理工作区。仅在需要持久化 Item、Mem
 - 当前路径是否为项目根目录存在实质歧义
 - 用户请求的其实不是“最小初始化”，而是顺带跑一轮更重的仓库治理扫描
 
-## 首轮回复契约
+## 首条用户可见输出契约
 
-首轮回复应直接说明会创建或校正哪些最小结构，并默认连续执行。
+如果上方 dispatch 已成功执行，则第一条用户可见文本应是**执行后的状态摘要**，不是执行前的计划说明。
 
-如果宿主有文件操作能力，则首轮回复之后必须在**同一回合**继续完成真实创建/修复，再结束回复。
-如果宿主是 Claude Code 一类会在 slash command 后直接 `end_turn` 的环境，则要把工具执行放在优先级高于铺陈的位置。
+如果宿主有文件操作能力，则命令在当前这一回合里已经有了真实工具动作；不要再把这轮回复写成“准备开始”。
+如果宿主是 Claude Code 一类会在 slash command 后直接 `end_turn` 的环境，更应该让第一条文本承担“结果汇报”而不是“流程铺陈”。
 如果当前会话已经列出 `Bash / Read / Write / Edit`，则应把“工具可用”视为已知事实，而不是待猜测前提。
 
 推荐形态：
 
-- “我先直接把 `.feflow/` 的最小工作区建起来或补齐缺失项；如果发现现有治理文件会被覆盖，我再停一次。”
+- “已补齐 `.feflow/` 最小工作区：新建了 …，保留了 …，当前仍为 `unknown` 的是 …。”
+- “我已检查当前目录并完成幂等初始化；已有治理文件未覆盖，只补了缺失项。”
 
 不要这样开场：
 
+- “我先直接把 `.feflow/` 的最小工作区建起来 …”
+- “我会开始初始化 …”
 - “我先做一轮全量项目研究”
 - “初始化分五个阶段，请逐步确认”
 - “先确认是否允许我创建每个目录”
@@ -138,6 +353,7 @@ description: 初始化 feflow 治理工作区。仅在需要持久化 Item、Mem
 - “请你再发一次 `/feflow:init`，我就开始真正落盘”
 - “使用 superpowers:using-superpowers 和 feflow:project-init ...”
 - “当前没有可用文件工具，所以我先给你一份方案”
+- “★ Insight …” 后面仍然没有任何创建结果
 
 暂停预算：
 

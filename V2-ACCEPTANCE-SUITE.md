@@ -61,6 +61,7 @@ Any scenario should be considered a **hard fail** if the assistant does one or m
 13. claims files were created, checked, or validated without any tool-backed evidence
 14. exposes internal skill names such as `superpowers:using-superpowers` or `feflow:project-init` in normal user-facing progress text
 15. claims file tools are unavailable even though the session metadata clearly exposes `Bash` / `Read` / `Write` / `Edit`
+16. when command dispatch already produced tool-backed evidence, still opens with future-tense narration such as “我先 … / I’ll …” instead of reporting inspected or changed results
 
 ---
 
@@ -174,10 +175,11 @@ Bad interaction shape:
 
 Good:
 
-- “我先直接把 `.feflow/` 最小工作区建起来或补齐缺失项；如果发现现有治理文件会被覆盖，我再停一次。”
+- “已补齐 `.feflow/` 最小工作区：新建了需要的目录和基础配置，已有治理文件未覆盖。”
 - and then it actually creates or repairs the workspace in that same turn
 - even in hosts where slash commands often end after one assistant turn, it still gets the file work done before stopping
 - when the session already exposes file tools, it uses them instead of claiming they are missing
+- preferred: the first visible sentence is already post-dispatch, not a pre-execution preamble
 
 Bad:
 
@@ -186,6 +188,7 @@ Bad:
 - “当前没有 skill/tool 入口，所以我不能真正执行”
 - “我先说明一下，下一条再真正执行”
 - “请你再发一次 `/feflow:init`”
+- “我先直接把 `.feflow/` 建起来 …” 然后没有任何创建结果
 
 ---
 

@@ -198,6 +198,21 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q 'BEGIN_FEFLOW_INIT_DISPATCH|上面的 init dispatch 已在你生成回复之前执行' "commands/init.md" || {
+    echo "init command is missing pre-dispatch execution contract" >&2
+    exit 1
+  }
+
+  rg -q 'BEGIN_FEFLOW_TASK_DISPATCH|上面的 task dispatch 已在你生成回复前执行' "commands/task.md" || {
+    echo "task command is missing pre-dispatch execution contract" >&2
+    exit 1
+  }
+
+  rg -q 'post-execution|post-dispatch|future-tense narration|完成态' "runtime/frontend-harness.md" "CLAUDE.md" "V2-ACCEPTANCE-SUITE.md" || {
+    echo "post-dispatch visible reply guidance is missing" >&2
+    exit 1
+  }
+
   hook_output="$(CLAUDE_PLUGIN_ROOT=1 ./hooks/session-start/detect.sh)"
   printf '%s' "$hook_output" | rg -q 'hookSpecificOutput|additionalContext' || {
     echo "session-start hook did not emit Claude Code context payload" >&2
@@ -336,6 +351,21 @@ else
 
   grep -qE 'If the session exposes tools such as|do not claim file tools are unavailable' "runtime/frontend-harness.md" "commands/init.md" "commands/task.md" || {
     echo "tool-availability truth-source guidance is missing" >&2
+    exit 1
+  }
+
+  grep -qE 'BEGIN_FEFLOW_INIT_DISPATCH|上面的 init dispatch 已在你生成回复之前执行' "commands/init.md" || {
+    echo "init command is missing pre-dispatch execution contract" >&2
+    exit 1
+  }
+
+  grep -qE 'BEGIN_FEFLOW_TASK_DISPATCH|上面的 task dispatch 已在你生成回复前执行' "commands/task.md" || {
+    echo "task command is missing pre-dispatch execution contract" >&2
+    exit 1
+  }
+
+  grep -qE 'post-execution|post-dispatch|future-tense narration|完成态' "runtime/frontend-harness.md" "CLAUDE.md" "V2-ACCEPTANCE-SUITE.md" || {
+    echo "post-dispatch visible reply guidance is missing" >&2
     exit 1
   }
 

@@ -174,6 +174,14 @@ Default behavior:
 
 For `/feflow:init` and `/feflow:task`, treat the command as an execution dispatch, not as a prompt for a planning monologue.
 
+If the command already produced shell-backed dispatch output before the model speaks, treat that output as real execution evidence.
+
+That means:
+
+- the first user-visible sentence should report what was inspected, created, repaired, or preserved
+- do not open with future-tense narration such as "我先", "I will", or "next I am going to"
+- do not place an `Insight` / process block before the first concrete result
+
 ### `/feflow:init`
 
 Preferred order:
@@ -182,6 +190,11 @@ Preferred order:
 2. create/repair minimal workspace with file tools
 3. read back the resulting structure or files
 4. then summarize
+
+Preferred visible opening after dispatch:
+
+- "已补齐 `.feflow/` 最小工作区 ..."
+- "我已检查当前目录并完成幂等初始化 ..."
 
 Do not spend the whole turn explaining the command.
 
@@ -193,6 +206,11 @@ Preferred order:
 2. classify risk based on actual code boundaries
 3. for L1, continue directly into edit + verification
 4. for L2/L3, give one compact risk note and keep moving
+
+Preferred visible opening after dispatch:
+
+- "我已经定位到 ..."
+- "我已经看到风险集中在 ..."
 
 Do not start `/feflow:task` with governance narration when file inspection can begin immediately.
 

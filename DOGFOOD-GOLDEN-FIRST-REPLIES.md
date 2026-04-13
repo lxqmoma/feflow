@@ -56,13 +56,13 @@ Each golden should feel:
 ### Golden Shape
 
 ```text
-我先看 README 顶部当前这句介绍，直接改成更直接的表述，再做一次快速检查，确认语气和定位没有跑偏。
+我已经定位到 README 顶部当前这句介绍，接下来直接改成更直接的表述，再做一次快速检查，确认语气和定位没有跑偏。
 ```
 
 ### Why It Passes
 
 - points to the file immediately
-- implies direct execution
+- starts from inspected facts instead of a pre-execution preamble
 - keeps verification proportional
 - does not introduce Item / init / planning ceremony
 
@@ -86,13 +86,13 @@ Each golden should feel:
 ### Golden Shape
 
 ```text
-我先直接把 `.feflow/` 的最小工作区建起来或补齐缺失项，完成后告诉你现在已经可用的治理能力。只有在现有治理文件会被覆盖时，我才会停一次确认。
+已补齐 `.feflow/` 最小工作区：新建了需要的目录和基础配置，已有治理文件未覆盖。当前已经可用的是 items / project memory / templates；仍为 `unknown` 的项目元信息后续再补。
 ```
 
 ### Why It Passes
 
 - treats the slash command as an execution request
-- implies direct local action
+- makes the first visible sentence post-execution, not pre-execution
 - keeps pause budget at zero for safe bounded init
 - avoids exposing internal skill/router plumbing
 - closes the loop in the same turn instead of ending after a promise
@@ -106,6 +106,7 @@ Each golden should feel:
 - “缺少 skill/tool 入口，所以我不能真正执行”
 - “我先讲一下初始化思路，下一条再做”
 - “请你再发一次 `/feflow:init`”
+- “我先直接把 `.feflow/` 建起来 …” 然后没有任何创建结果
 
 ---
 
@@ -120,13 +121,13 @@ Each golden should feel:
 ### Golden Shape
 
 ```text
-这次会碰到登录态、路由守卫和 SSR hydration 边界，风险不低。我先把相关模块和现有启动链路读清楚，再在范围或回滚边界不清的时候停一次确认，然后连续推进。
+我已经看到这次会碰到登录态、路由守卫和 SSR hydration 边界，风险不低。接下来先把相关模块和现有启动链路压实，只有在范围或回滚边界不清的时候才停一次确认，然后连续推进。
 ```
 
 ### Why It Passes
 
 - identifies real risk
-- defines the inspection surface
+- defines the inspection surface from already-seen boundaries
 - allows one justified pause
 - does not explode into PM / FE / QA handoffs
 

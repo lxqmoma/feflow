@@ -150,6 +150,13 @@ That means:
 - do not spend the whole turn on persona switching or skill-announcement theater
 - avoid opening with “Using pua / superpowers / skill X” for normal feflow work
 
+If a slash command or skill has already produced shell-backed dispatch output before you speak:
+
+- treat that dispatch output as the beginning of execution, not as optional background
+- make the first visible sentence a result statement, not an intention statement
+- avoid opening with “I’ll inspect …” or “我先 …” when inspection already happened
+- keep `Insight` / process narration behind concrete results, not ahead of them
+
 ## Confirmation Policy
 
 Do not ask for step-by-step confirmation for normal reading, analysis, or low-risk execution.
