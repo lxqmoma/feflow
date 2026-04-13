@@ -43,10 +43,10 @@ elif [ -f bun.lockb ] || [ -f bun.lock ]; then
 fi
 
 framework="unknown"
-if ls nuxt.config.* >/dev/null 2>&1; then
+if find . -maxdepth 1 -type f -name 'nuxt.config.*' | grep -q .; then
   framework="Nuxt"
 elif [ -f package.json ] && grep -qi '"vue"' package.json; then
-  if ls vite.config.* >/dev/null 2>&1; then
+  if find . -maxdepth 1 -type f -name 'vite.config.*' | grep -q .; then
     framework="Vue 3 + Vite"
   else
     framework="Vue"

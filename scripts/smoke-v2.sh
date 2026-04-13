@@ -6,6 +6,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 required_files=(
+  ".claude-plugin/plugin.json"
   "README.md"
   "README.en.md"
   "V2-ACCEPTANCE-SUITE.md"
@@ -260,6 +261,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  jq -e '(.hooks.UserPromptSubmit[0] | has("matcher") | not) and (.hooks.Stop[0] | has("matcher") | not)' "hooks/hooks.json" >/dev/null 2>&1 || {
+    echo "hooks/hooks.json still uses unsupported matcher fields for UserPromptSubmit or Stop" >&2
+    exit 1
+  }
+
   user_prompt_output="$(printf '%s' '{"user_prompt":"/feflow:task test"}' | ./hooks/user-prompt/feflow-command-override.sh)"
   printf '%s' "$user_prompt_output" | rg -q 'EXTREMELY_IMPORTANT|do not invoke `pua`|omit `pages`' || {
     echo "user-prompt hook is missing feflow command override content" >&2
@@ -491,6 +497,11 @@ else
 
   jq empty "hooks/hooks.json" >/dev/null 2>&1 || {
     echo "hooks/hooks.json is not valid JSON" >&2
+    exit 1
+  }
+
+  jq -e '(.hooks.UserPromptSubmit[0] | has("matcher") | not) and (.hooks.Stop[0] | has("matcher") | not)' "hooks/hooks.json" >/dev/null 2>&1 || {
+    echo "hooks/hooks.json still uses unsupported matcher fields for UserPromptSubmit or Stop" >&2
     exit 1
   }
 
