@@ -208,6 +208,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q 'shell: bash' "commands/init.md" "commands/task.md" || {
+    echo "command shell mode is not pinned to bash" >&2
+    exit 1
+  }
+
   rg -q 'post-execution|post-dispatch|future-tense narration|完成态' "runtime/frontend-harness.md" "CLAUDE.md" "V2-ACCEPTANCE-SUITE.md" || {
     echo "post-dispatch visible reply guidance is missing" >&2
     exit 1
@@ -361,6 +366,11 @@ else
 
   grep -qE 'BEGIN_FEFLOW_TASK_DISPATCH|上面的 task dispatch 已在你生成回复前执行' "commands/task.md" || {
     echo "task command is missing pre-dispatch execution contract" >&2
+    exit 1
+  }
+
+  grep -q 'shell: bash' "commands/init.md" "commands/task.md" || {
+    echo "command shell mode is not pinned to bash" >&2
     exit 1
   }
 

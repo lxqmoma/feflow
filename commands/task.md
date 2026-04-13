@@ -1,6 +1,7 @@
 ---
 description: 交付入口。用于真正要落地的研发任务；按风险决定是否创建 Item。
 disable-model-invocation: true
+shell: bash
 allowed-tools:
   - Bash
   - Read

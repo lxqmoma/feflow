@@ -1,6 +1,7 @@
 ---
 description: 初始化 feflow 治理工作区。仅在需要持久化 Item、Memory、Evidence 时使用。
 disable-model-invocation: true
+shell: bash
 allowed-tools:
   - Bash
   - Read
@@ -87,15 +88,15 @@ created_files=()
 preserved_files=()
 
 write_if_missing() {
-  local path="$1"
+  local target_file="$1"
   shift
-  if [ -e "$path" ]; then
-    preserved_files+=("$path")
+  if [ -e "$target_file" ]; then
+    preserved_files+=("$target_file")
     cat >/dev/null
     return
   fi
-  cat >"$path"
-  created_files+=("$path")
+  cat >"$target_file"
+  created_files+=("$target_file")
 }
 
 write_if_missing .feflow/project/init-config.md <<EOF
