@@ -22,6 +22,7 @@ required_files=(
   "hooks/hooks.json"
   "hooks/session-start/detect.sh"
   "hooks/user-prompt/feflow-command-override.sh"
+  "scripts/feflow_user_prompt_hook.py"
   "scripts/feflow_hook_context.py"
   "scripts/guard-feflow-skill.py"
   "scripts/guard-feflow-stop.py"
@@ -225,7 +226,7 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
-  rg -q 'UserPromptSubmit|PreToolUse|Stop|guard-feflow-skill.py|guard-feflow-stop.py|feflow-command-override.sh' "hooks/hooks.json" || {
+  rg -q 'UserPromptSubmit|PreToolUse|Stop|guard-feflow-skill.py|guard-feflow-stop.py|feflow_user_prompt_hook.py' "hooks/hooks.json" || {
     echo "plugin runtime guard hooks are missing" >&2
     exit 1
   }
@@ -266,7 +267,7 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
-  user_prompt_output="$(printf '%s' '{"user_prompt":"/feflow:task test"}' | ./hooks/user-prompt/feflow-command-override.sh)"
+  user_prompt_output="$(printf '%s' '{"session_id":"smoke-feflow-user-prompt","transcript_path":"'"$ROOT_DIR"'/README.md","prompt":"/feflow:task test"}' | python3 ./scripts/feflow_user_prompt_hook.py)"
   printf '%s' "$user_prompt_output" | rg -q 'EXTREMELY_IMPORTANT|do not invoke `pua`|omit `pages`' || {
     echo "user-prompt hook is missing feflow command override content" >&2
     exit 1
@@ -476,7 +477,7 @@ else
     exit 1
   }
 
-  grep -qE 'UserPromptSubmit|PreToolUse|Stop|guard-feflow-skill.py|guard-feflow-stop.py|feflow-command-override.sh' "hooks/hooks.json" || {
+  grep -qE 'UserPromptSubmit|PreToolUse|Stop|guard-feflow-skill.py|guard-feflow-stop.py|feflow_user_prompt_hook.py' "hooks/hooks.json" || {
     echo "plugin runtime guard hooks are missing" >&2
     exit 1
   }
@@ -512,12 +513,12 @@ else
     exit 1
   }
 
-  jq -e '(.hooks.UserPromptSubmit[0] | has("matcher") | not) and (.hooks.Stop[0] | has("matcher") | not)' "hooks/hooks.json" >/dev/null 2>&1 || {
-    echo "hooks/hooks.json still uses unsupported matcher fields for UserPromptSubmit or Stop" >&2
+  jq -e '(.hooks.UserPromptSubmit[0].matcher == "*") and (.hooks.Stop[0].matcher == "*")' "hooks/hooks.json" >/dev/null 2>&1 || {
+    echo "hooks/hooks.json is missing runtime-compatible catch-all matchers for UserPromptSubmit or Stop" >&2
     exit 1
   }
 
-  user_prompt_output="$(printf '%s' '{"user_prompt":"/feflow:task test"}' | ./hooks/user-prompt/feflow-command-override.sh)"
+  user_prompt_output="$(printf '%s' '{"session_id":"smoke-feflow-user-prompt","transcript_path":"'"$ROOT_DIR"'/README.md","prompt":"/feflow:task test"}' | python3 ./scripts/feflow_user_prompt_hook.py)"
   printf '%s' "$user_prompt_output" | grep -qE 'EXTREMELY_IMPORTANT|do not invoke `pua`|omit `pages`' || {
     echo "user-prompt hook is missing feflow command override content" >&2
     exit 1

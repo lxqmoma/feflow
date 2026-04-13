@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import json
 import re
+import tempfile
+from hashlib import sha1
 from pathlib import Path
 from typing import Any
 
 
 COMMAND_RE = re.compile(r"/feflow:[a-z0-9-]+", re.IGNORECASE)
+STATE_DIR = Path(tempfile.gettempdir()) / "feflow-hook-state"
 
 
 def extract_feflow_command(text: str | None) -> str | None:
@@ -19,10 +22,61 @@ def extract_feflow_command(text: str | None) -> str | None:
     return match.group(0).lower()
 
 
+def state_path_for(payload: dict[str, Any]) -> Path | None:
+    session_id = payload.get("session_id")
+    transcript_path = payload.get("transcript_path")
+    raw_key = str(session_id or transcript_path or "").strip()
+    if not raw_key:
+        return None
+
+    digest = sha1(raw_key.encode("utf-8")).hexdigest()
+    return STATE_DIR / f"{digest}.json"
+
+
+def remember_feflow_command(payload: dict[str, Any], command: str | None) -> None:
+    if not command:
+        return
+
+    state_path = state_path_for(payload)
+    if state_path is None:
+        return
+
+    try:
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        state_path.write_text(
+            json.dumps({"command": command}, ensure_ascii=False),
+            encoding="utf-8",
+        )
+    except Exception:
+        return
+
+
+def read_remembered_feflow_command(payload: dict[str, Any]) -> str | None:
+    state_path = state_path_for(payload)
+    if state_path is None or not state_path.is_file():
+        return None
+
+    try:
+        data = json.loads(state_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+    command = extract_feflow_command(data.get("command"))
+    if not command:
+        return None
+    return command
+
+
 def detect_feflow_command(payload: dict[str, Any]) -> str | None:
-    command = extract_feflow_command(payload.get("user_prompt"))
-    if command:
-        return command
+    for key in ("user_prompt", "prompt"):
+        command = extract_feflow_command(payload.get(key))
+        if command:
+            remember_feflow_command(payload, command)
+            return command
+
+    remembered_command = read_remembered_feflow_command(payload)
+    if remembered_command:
+        return remembered_command
 
     transcript_path = payload.get("transcript_path")
     if not transcript_path:
@@ -70,8 +124,10 @@ def detect_feflow_command(payload: dict[str, Any]) -> str | None:
                     if command:
                         last_command = command
     except Exception:
-        return None
+        return remembered_command
 
+    if last_command:
+        remember_feflow_command(payload, last_command)
     return last_command
 
 

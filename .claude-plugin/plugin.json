@@ -1,6 +1,6 @@
 {
   "name": "feflow",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "前端研发协作治理层 — 默认像强助手，按风险启用 Item、Memory、Evidence 与 Incident 能力",
   "author": {
     "name": "liuxiangqing",
