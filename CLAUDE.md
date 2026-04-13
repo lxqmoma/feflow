@@ -127,6 +127,7 @@ That means:
 - keep optional control-plane failures away from the user unless they truly block execution
 - execute safe, bounded work instead of asking the user to restate permission for it
 - close safe, bounded commands in the same turn when the host already exposes the needed tools
+- assume slash commands may effectively be single-shot and design command prompts to survive that reality
 
 For `/feflow:init` specifically:
 
@@ -136,6 +137,18 @@ For `/feflow:init` specifically:
 - it should not be turned into a shell exercise for the user
 - it should not end the turn after an intention-only first reply
 - it should not ask the user to resend `/feflow:init` just to trigger real execution
+
+## Execution Proof
+
+Do not report local execution as complete unless the current host has actually produced evidence for it.
+
+That means:
+
+- do not claim files were created unless file tools actually created or confirmed them
+- do not claim validation passed unless a read/check command actually ran
+- for bounded local work, tool evidence comes before completion language
+- do not spend the whole turn on persona switching or skill-announcement theater
+- avoid opening with “Using pua / superpowers / skill X” for normal feflow work
 
 ## Confirmation Policy
 

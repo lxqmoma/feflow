@@ -57,6 +57,8 @@ Any scenario should be considered a **hard fail** if the assistant does one or m
 9. tells the user to run a `/feflow:*` chat command as a shell command
 10. claims a command cannot run merely because a named skill/tool entry is unavailable
 11. asks for approval before a bounded, non-destructive `/feflow:init`
+12. opens normal feflow work by narrating external personas or skill names such as `pua` / `superpowers`
+13. claims files were created, checked, or validated without any tool-backed evidence
 
 ---
 
@@ -172,6 +174,7 @@ Good:
 
 - “我先直接把 `.feflow/` 最小工作区建起来或补齐缺失项；如果发现现有治理文件会被覆盖，我再停一次。”
 - and then it actually creates or repairs the workspace in that same turn
+- even in hosts where slash commands often end after one assistant turn, it still gets the file work done before stopping
 
 Bad:
 

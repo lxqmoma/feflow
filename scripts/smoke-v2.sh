@@ -98,6 +98,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q '## Execution Proof|do not claim files were created unless file tools actually created or confirmed them' "CLAUDE.md" || {
+    echo "CLAUDE is missing execution-proof guidance" >&2
+    exit 1
+  }
+
   rg -q 'First Reply Contract' "adapters/generic/AGENTS.md" || {
     echo "generic adapter is missing first reply contract" >&2
     exit 1
@@ -143,6 +148,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q '只有一回合完成机会|single-shot|slash command 很容易在第一条助手消息后直接结束' "commands/init.md" "skills/project-init/SKILL.md" "CLAUDE.md" || {
+    echo "init flow is missing single-shot slash-command semantics" >&2
+    exit 1
+  }
+
   rg -q '再发一次 `/feflow:init`|再次发送 `/init` 或 `/feflow:init`' "commands/init.md" "skills/project-init/SKILL.md" "DOGFOOD-GOLDEN-FIRST-REPLIES.md" || {
     echo "init flow is missing anti-repeat-command guidance" >&2
     exit 1
@@ -155,6 +165,11 @@ if command -v rg >/dev/null 2>&1; then
 
   rg -q 'Scenario `A0`|Scenario `G0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "V2-ACCEPTANCE-SUITE.md" || {
     echo "acceptance suite is missing core scenarios" >&2
+    exit 1
+  }
+
+  rg -q 'pua / superpowers|claims files were created, checked, or validated without any tool-backed evidence' "V2-ACCEPTANCE-SUITE.md" "hooks/session-start/detect.sh" || {
+    echo "acceptance/session hook are missing anti-theater execution-proof guidance" >&2
     exit 1
   }
 
@@ -190,6 +205,11 @@ else
 
   grep -qE '## Harness Engineering|behave like a \*\*harness\*\*|behave like a harness' "CLAUDE.md" || {
     echo "CLAUDE is missing Harness Engineering guidance" >&2
+    exit 1
+  }
+
+  grep -qE '## Execution Proof|do not claim files were created unless file tools actually created or confirmed them' "CLAUDE.md" || {
+    echo "CLAUDE is missing execution-proof guidance" >&2
     exit 1
   }
 
@@ -238,6 +258,11 @@ else
     exit 1
   }
 
+  grep -qE '只有一回合完成机会|single-shot|slash command 很容易在第一条助手消息后直接结束' "commands/init.md" "skills/project-init/SKILL.md" "CLAUDE.md" || {
+    echo "init flow is missing single-shot slash-command semantics" >&2
+    exit 1
+  }
+
   grep -qE '再发一次 `/feflow:init`|再次发送 `/init` 或 `/feflow:init`' "commands/init.md" "skills/project-init/SKILL.md" "DOGFOOD-GOLDEN-FIRST-REPLIES.md" || {
     echo "init flow is missing anti-repeat-command guidance" >&2
     exit 1
@@ -250,6 +275,11 @@ else
 
   grep -qE 'Scenario `A0`|Scenario `G0`|Scenario `D1`|Scenario `D3`|Scenario `I4`' "V2-ACCEPTANCE-SUITE.md" || {
     echo "acceptance suite is missing core scenarios" >&2
+    exit 1
+  }
+
+  grep -qE 'pua / superpowers|claims files were created, checked, or validated without any tool-backed evidence' "V2-ACCEPTANCE-SUITE.md" "hooks/session-start/detect.sh" || {
+    echo "acceptance/session hook are missing anti-theater execution-proof guidance" >&2
     exit 1
   }
 

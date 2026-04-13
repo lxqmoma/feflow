@@ -96,6 +96,7 @@ Each golden should feel:
 - keeps pause budget at zero for safe bounded init
 - avoids exposing internal skill/router plumbing
 - closes the loop in the same turn instead of ending after a promise
+- survives single-shot slash-command behavior by prioritizing tool execution over narration
 
 ### Common Fails
 
