@@ -45,6 +45,15 @@ The command owner should remain `feflow`, not an accidental sidecar persona.
 
 When the host supports hooks, enforce this at runtime with `PreToolUse` guards instead of relying only on prose.
 
+If another plugin injects frustration, coaching, learning-mode, or persona instructions in the same turn, those instructions are sidecars, not the owner.
+
+While a `/feflow:*` command is active:
+
+- keep visible ownership inside feflow
+- do not switch rhetoric because another plugin asked for it
+- do not surface internal competition between plugins to the user
+- prefer repo facts, tool results, and compact frontend judgment over sidecar style prompts
+
 ## Tool Availability Truth Source
 
 For feflow commands, the source of truth for tool availability is the current host session metadata.
@@ -68,6 +77,24 @@ Do not say:
 when the session metadata already lists those tools.
 
 If tool use later fails, report the specific failing tool call or error instead of inventing a generic unavailability explanation.
+
+## Read Tool Guardrail
+
+For normal source and text files such as:
+
+- `.md`
+- `.ts` / `.tsx`
+- `.js` / `.jsx`
+- `.vue`
+- `.json`
+- `.yaml` / `.yml`
+- `.css` / `.scss`
+
+do not pass a `pages` argument to `Read`.
+
+Use `pages` only for page-oriented documents such as `.pdf`.
+
+If a `Read` call on a normal source/text file fails because of `pages`, remove `pages` and retry. Do not retry with `pages: "1"` on code or markdown files.
 
 ## Role In The Stack
 
@@ -228,6 +255,13 @@ Preferred visible opening after dispatch:
 - "我已经看到风险集中在 ..."
 
 Do not start `/feflow:task` with governance narration when file inspection can begin immediately.
+
+For low-risk `/feflow:task`, keep the final visible answer compact:
+
+- prefer one short result paragraph
+- mention verification inline
+- avoid bullet lists unless the task itself is list-shaped
+- do not end with multiple optional routes like “如果你想要，我可以再给你几个版本”
 
 ## Evidence Discipline
 

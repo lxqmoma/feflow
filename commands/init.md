@@ -217,6 +217,7 @@ printf 'END_FEFLOW_INIT_DISPATCH\n'
 - 先给结果，再给下一步建议
 - 如果需要给后续建议，只保留一行，不要编号，不要列多条路线
 - 默认直接用 `Bash / Read / Write / Edit / Grep / Glob` 推进，不要再绕去外部 skill 或待办流程
+- 对普通文本、源码、配置文件使用 `Read` 时不要传 `pages`；`pages` 只用于 PDF 这类分页文档
 
 ## 触发方式
 

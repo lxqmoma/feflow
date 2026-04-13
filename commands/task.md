@@ -114,6 +114,8 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 - 如果接下来要继续用 `Read / Grep / Edit / Bash`，可以继续，但第一条文本必须已经带有检查后的事实
 - L1 任务默认直接用 `Bash / Read / Write / Edit / Grep / Glob` 推进，不要再绕去外部 skill 或待办流程
 - 如果需要补一句下一步，只保留一行，不要编号，不要展开多路线说明
+- 对普通源码、Markdown、JSON、配置文件使用 `Read` 时不要传 `pages`；`pages` 只用于 PDF 这类分页文档
+- L1 最终回复优先用一个短段落收束，除非用户要列表，否则不要展开成 bullet list
 
 ## 触发方式
 
@@ -162,11 +164,13 @@ printf 'END_FEFLOW_TASK_DISPATCH\n'
 3. 不要先输出“我会如何处理”，却不开始任何文件检查
 4. 不要声称“当前没有可用文件工具”，除非具体工具调用已经返回失败
 5. 如果上方 dispatch 已经给出了检查结果，则第一条用户可见文本应使用完成态，而不是“我先 …”
+6. 对源码、配置、Markdown 文件调用 `Read` 时省略 `pages`；只有 PDF 这类分页文档才传 `pages`
 
 对于 L1：
 
 - 理想路径是同一回合完成 inspect -> edit -> verify -> summarize
 - 如果无法在同一回合完成 edit，至少也应在第一条用户可见文本里明确“已经检查了哪些文件/入口”
+- 最终回复默认收敛成一个短结果段落，不要再附加多路线建议或模板化小标题
 
 对于 L2/L3：
 

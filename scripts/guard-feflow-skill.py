@@ -19,6 +19,7 @@ BLOCKED_READ_PATH_FRAGMENTS = (
     "/plugins/marketplaces/pua-skills/",
 )
 PRETOOL_EVENT = "PreToolUse"
+PAGE_ORIENTED_SUFFIXES = (".pdf",)
 
 
 def deny(message: str) -> int:
@@ -68,12 +69,25 @@ def handle_read(tool_input: dict[str, object]) -> int:
         )
 
     pages = tool_input.get("pages")
+    if "pages" not in tool_input:
+        return 0
+
     if isinstance(pages, str) and not pages.strip():
         updated_input = dict(tool_input)
         updated_input.pop("pages", None)
         return allow_with_updated_input(
             updated_input,
             "Removed an empty `pages` argument from `Read`. "
+            "Use `pages` only for page-oriented documents such as PDFs.",
+        )
+
+    normalized_path = file_path.lower()
+    if normalized_path and not normalized_path.endswith(PAGE_ORIENTED_SUFFIXES):
+        updated_input = dict(tool_input)
+        updated_input.pop("pages", None)
+        return allow_with_updated_input(
+            updated_input,
+            "Removed `pages` from `Read` for a normal source/text file. "
             "Use `pages` only for page-oriented documents such as PDFs.",
         )
 

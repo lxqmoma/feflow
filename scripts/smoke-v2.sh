@@ -261,8 +261,8 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
-  jq -e '(.hooks.UserPromptSubmit[0] | has("matcher") | not) and (.hooks.Stop[0] | has("matcher") | not)' "hooks/hooks.json" >/dev/null 2>&1 || {
-    echo "hooks/hooks.json still uses unsupported matcher fields for UserPromptSubmit or Stop" >&2
+  jq -e '(.hooks.UserPromptSubmit[0].matcher == "*") and (.hooks.Stop[0].matcher == "*")' "hooks/hooks.json" >/dev/null 2>&1 || {
+    echo "hooks/hooks.json is missing runtime-compatible catch-all matchers for UserPromptSubmit or Stop" >&2
     exit 1
   }
 
@@ -293,6 +293,18 @@ if command -v rg >/dev/null 2>&1; then
   if printf '%s' "$pretool_read_output" | rg -q '"pages"'; then
     rm -f "$tmp_transcript"
     echo "pretool hook left an empty pages argument in updated Read input" >&2
+    exit 1
+  fi
+
+  pretool_code_pages_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"/tmp/README.md\",\"pages\":\"1\"}}" | python3 ./scripts/guard-feflow-skill.py)"
+  printf '%s' "$pretool_code_pages_output" | rg -q '"hookEventName": ?"PreToolUse"|"updatedInput"|Removed `pages` from `Read` for a normal source/text file' || {
+    rm -f "$tmp_transcript"
+    echo "pretool hook did not sanitize non-PDF Read pages usage" >&2
+    exit 1
+  }
+  if printf '%s' "$pretool_code_pages_output" | rg -q '"pages"'; then
+    rm -f "$tmp_transcript"
+    echo "pretool hook left a pages argument on non-PDF Read input" >&2
     exit 1
   fi
 
