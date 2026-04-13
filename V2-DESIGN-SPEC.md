@@ -46,6 +46,24 @@ The product thesis is:
 - default to hidden orchestration, not visible process narration
 - escalate governance by risk, not by mere task presence
 
+## 3.1 Layered Architecture Thesis
+
+`feflow` should not compete with `superpowers` for the role of general execution substrate.
+
+The intended stack is:
+
+1. **Host runtime** for real tool execution
+2. **Superpowers** for general execution discipline and process rigor
+3. **feflow** for frontend-specific routing, risk judgment, memory, and governance
+
+Therefore v2 should evolve toward:
+
+- `superpowers` as the base operating discipline
+- `feflow` as the frontend lead-engineer layer
+- one visible owner, hidden specialist consultation
+
+If `feflow` tries to replace layer 2 with another generic orchestration shell, it will feel slower and weaker than `superpowers`.
+
 ## 4. Goals
 
 `feflow` v2 MUST achieve the following:
@@ -258,6 +276,16 @@ The router MUST consider:
 - risk keywords
 - scope of impact
 - reversibility of action
+
+### 9.2 Visible Ownership
+
+For frontend work, the user should primarily experience one visible owner:
+
+- default visible owner: FE
+- hidden consult lenses: Backend / Designer / QA / Reviewer / Researcher / PM
+
+These are not meant to be serialized handoff stages.
+They are internal expertise lenses used to sharpen execution.
 
 ### 9.2 Router Outputs
 
@@ -786,4 +814,3 @@ This spec is accepted only if all of the following hold:
 3. Startup no longer hard-routes all development tasks into delivery orchestration.
 4. User-facing interaction no longer exposes internal workflow terms by default.
 5. Governance remains available and strong for high-risk delivery and incidents.
-

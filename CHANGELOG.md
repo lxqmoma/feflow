@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.2.0] - 2026-04-13
+
+### Changed
+
+- 明确 `feflow` 的层级定位：建立在 `superpowers` 之上的前端专业化治理层，而不是并行竞争的通用流程引擎
+- SessionStart hook 改为注入 `frontend-harness` 运行时契约，而不是只注入状态描述
+- `orchestrator` 明确采用 “一个可见 owner + 多个隐藏专业视角” 的前端团队模型
+
+### Added
+
+- `runtime/frontend-harness.md` 作为前端专业层的启动契约
+- 分层架构说明：Host tools / Superpowers / feflow
+
+### Fixed
+
+- 减少与 `superpowers` 的控制面冲突
+- 抑制把专业视角误用成显式流程 handoff 的倾向
+
 ## [0.1.0] - 2026-04-08
 
 ### Added

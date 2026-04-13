@@ -208,19 +208,28 @@ feflow/
 
 ## 与 Superpowers 的关系
 
-feflow 不应该和 Superpowers 竞争“谁来接管所有任务”，而应该形成分工：
+feflow 不应该和 Superpowers 竞争“谁来接管所有任务”，而应该形成分层：
 
-| 维度 | Superpowers | feflow |
-|------|-------------|--------|
-| 默认体验 | 通用强助手 | 前端研发治理层 |
-| 优势 | 直接做事、通用协作、通用 planning/review | Item/Memory/Evidence/Incident 治理 |
-| 适合场景 | 通用开发与编码任务 | 研发协作、复杂交付、事故治理、可追踪执行 |
+| 层级 | 职责 |
+|------|------|
+| Host tools | 真正执行读、搜、改、写、验证 |
+| Superpowers | 通用执行纪律、skill 路由、调试/TDD/review 方法论 |
+| feflow | 前端专业路由、风险判断、项目记忆、交付治理 |
 
 理想状态下：
 
-- 小任务体验要接近 Superpowers
-- 复杂任务治理能力要强于通用助手
-- 事故处理要比通用 planning 更快进入恢复路径
+- 小任务体验直接继承 Superpowers 的执行质感
+- 前端复杂任务由 feflow 提供更强的专业判断和治理深度
+- 用户感受到的是“一个经验老到的前端团队负责人”，不是两套流程在争抢控制权
+
+### 前端团队模型
+
+feflow 更适合被理解成一个隐藏协作面的前端团队：
+
+- `FE` 是默认可见 owner
+- `Backend / Designer / QA / Reviewer / Researcher / PM` 是按需介入的专业视角
+- 它们不应该变成串行广播的流程阶段
+- 结果应该表现为：任务被正确理解、正确路由、连续推进、按风险给证据
 
 ## 当前改造方向
 

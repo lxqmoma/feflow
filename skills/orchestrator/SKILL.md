@@ -7,6 +7,14 @@ description: Feflow v2 mode router. Routes work into Assist, Delivery, or Incide
 
 `orchestrator` in v2 is a router, not the default visible workflow controller.
 
+It sits **above** the host execution substrate.
+
+In environments where `superpowers` already provides generic execution discipline, `orchestrator` should:
+
+- reuse that discipline
+- add frontend-specific routing and governance
+- avoid competing for generic control-plane authority
+
 Its job is to:
 
 1. classify the user request into `Assist`, `Delivery`, or `Incident`
@@ -27,6 +35,12 @@ Always execute in this order:
 3. Determine the risk level.
 4. Decide whether an `Item` is actually needed.
 5. Route to the appropriate execution path.
+
+Visible ownership rule:
+
+- keep `fe` as the default visible owner for frontend delivery
+- use other specialist lenses only when needed
+- hide internal consultations unless the user explicitly asks for them
 
 Do not:
 

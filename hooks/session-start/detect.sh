@@ -1,12 +1,28 @@
 #!/usr/bin/env bash
 # feflow session startup detection
-# Reports governance capability availability without forcing all tasks into workflow orchestration.
+# Injects frontend-specialized runtime guidance without competing with the base execution substrate.
 
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 PROJECT_DIR="${PWD}"
 FEFLOW_DIR="${PROJECT_DIR}/.feflow"
 INIT_CONFIG="${FEFLOW_DIR}/project/init-config.md"
+HARNESS_FILE="${PLUGIN_ROOT}/runtime/frontend-harness.md"
+
+frontend_harness_content=$(cat "${HARNESS_FILE}" 2>&1 || echo "Error reading feflow frontend harness")
+
+escape_for_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
 
 if [ -d "${FEFLOW_DIR}" ]; then
   feflow_initialized=true
@@ -31,4 +47,14 @@ else
   context="当前项目未启用 feflow 治理目录。你仍可直接执行仓库扫描、阅读、解释和低风险任务；只有在用户明确需要前端交付治理能力时，再建议运行 /feflow:init。若用户已经发出 `/feflow:init`，就把它当成执行请求：直接用可用工具创建最小工作区，而不是继续解释流程、切换人设、或要求用户重复命令。"
 fi
 
-echo "{\"additionalContext\": \"[feflow:${status}] ${context}\"}"
+frontend_harness_escaped=$(escape_for_json "$frontend_harness_content")
+status_context_escaped=$(escape_for_json "[feflow:${status}] ${context}")
+session_context="<FEFLOW_FRONTEND_HARNESS>\n${frontend_harness_escaped}\n\nCurrent workspace state:\n${status_context_escaped}\n</FEFLOW_FRONTEND_HARNESS>"
+
+if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+fi

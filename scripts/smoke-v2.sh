@@ -103,6 +103,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  test -f "runtime/frontend-harness.md" || {
+    echo "frontend runtime harness is missing" >&2
+    exit 1
+  }
+
   rg -q 'First Reply Contract' "adapters/generic/AGENTS.md" || {
     echo "generic adapter is missing first reply contract" >&2
     exit 1
@@ -173,6 +178,16 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  rg -q 'frontend-harness.md|FEFLOW_FRONTEND_HARNESS|hookSpecificOutput' "hooks/session-start/detect.sh" || {
+    echo "session-start hook is missing frontend harness injection" >&2
+    exit 1
+  }
+
+  rg -q 'superpowers.*base execution discipline|default visible owner: FE|one visible owner' "runtime/frontend-harness.md" "V2-DESIGN-SPEC.md" "README.md" "skills/orchestrator/SKILL.md" || {
+    echo "layered superpowers-first architecture is not fully encoded" >&2
+    exit 1
+  }
+
   if rg -n '按阶段检查预期产出|完整度: 5/8|5/8 \\(62\\.5%\\)' "skills/evidence-chain/SKILL.md"; then
     echo "evidence-chain still contains rigid legacy completeness language" >&2
     exit 1
@@ -210,6 +225,11 @@ else
 
   grep -qE '## Execution Proof|do not claim files were created unless file tools actually created or confirmed them' "CLAUDE.md" || {
     echo "CLAUDE is missing execution-proof guidance" >&2
+    exit 1
+  }
+
+  test -f "runtime/frontend-harness.md" || {
+    echo "frontend runtime harness is missing" >&2
     exit 1
   }
 
@@ -280,6 +300,16 @@ else
 
   grep -qE 'pua / superpowers|claims files were created, checked, or validated without any tool-backed evidence' "V2-ACCEPTANCE-SUITE.md" "hooks/session-start/detect.sh" || {
     echo "acceptance/session hook are missing anti-theater execution-proof guidance" >&2
+    exit 1
+  }
+
+  grep -qE 'frontend-harness.md|FEFLOW_FRONTEND_HARNESS|hookSpecificOutput' "hooks/session-start/detect.sh" || {
+    echo "session-start hook is missing frontend harness injection" >&2
+    exit 1
+  }
+
+  grep -qE 'superpowers.*base execution discipline|default visible owner: FE|one visible owner' "runtime/frontend-harness.md" "V2-DESIGN-SPEC.md" "README.md" "skills/orchestrator/SKILL.md" || {
+    echo "layered superpowers-first architecture is not fully encoded" >&2
     exit 1
   }
 
