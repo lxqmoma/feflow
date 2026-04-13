@@ -18,12 +18,15 @@ BLOCKED_READ_PATH_FRAGMENTS = (
     "/plugins/cache/pua-skills/",
     "/plugins/marketplaces/pua-skills/",
 )
+PRETOOL_EVENT = "PreToolUse"
 
 
 def deny(message: str) -> int:
     response = {
         "hookSpecificOutput": {
+            "hookEventName": PRETOOL_EVENT,
             "permissionDecision": "deny",
+            "permissionDecisionReason": message,
         },
         "systemMessage": message,
     }
@@ -34,7 +37,9 @@ def deny(message: str) -> int:
 def allow_with_updated_input(updated_input: dict[str, object], message: str) -> int:
     response = {
         "hookSpecificOutput": {
+            "hookEventName": PRETOOL_EVENT,
             "permissionDecision": "allow",
+            "permissionDecisionReason": message,
             "updatedInput": updated_input,
         },
         "systemMessage": message,

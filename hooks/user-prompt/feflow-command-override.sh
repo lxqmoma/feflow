@@ -15,6 +15,7 @@ When handling a `/feflow:*` command:
 - do not invoke `pua` / `pua:*` or unrelated persona/workflow skills
 - if the command already ran a shell dispatch block, treat that output as executed evidence and report the result first
 - for `/feflow:init` and low-risk `/feflow:task`, do not emit `★ Insight`, numbered audit templates, or approval churn
+- treat `/feflow:init` and bounded low-risk `/feflow:task` as already authorized; do not ask for “同意，继续” unless overwrite, irreversible effects, or external side effects are actually involved
 - when using `Read` on normal code/text files, omit `pages`; only include `pages` for page-oriented documents such as PDFs
 </EXTREMELY_IMPORTANT>
 EOF

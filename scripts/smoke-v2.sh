@@ -268,16 +268,18 @@ if command -v rg >/dev/null 2>&1; then
 
   tmp_transcript="$(mktemp)"
   printf '%s\n' '{"type":"user","message":{"role":"user","content":"<command-name>/feflow:task</command-name>"}}' >"$tmp_transcript"
+  tmp_init_transcript="$(mktemp)"
+  printf '%s\n' '{"type":"user","message":{"role":"user","content":"<command-name>/feflow:init</command-name>"}}' >"$tmp_init_transcript"
 
   pretool_skill_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"pua\"}}" | python3 ./scripts/guard-feflow-skill.py)"
-  printf '%s' "$pretool_skill_output" | rg -q '"permissionDecision": ?"deny"|Do not invoke unrelated external persona/workflow skills' || {
+  printf '%s' "$pretool_skill_output" | rg -q '"hookEventName": ?"PreToolUse"|"permissionDecision": ?"deny"|Do not invoke unrelated external persona/workflow skills' || {
     rm -f "$tmp_transcript"
     echo "pretool hook did not deny pua skill invocation inside feflow commands" >&2
     exit 1
   }
 
   pretool_read_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"/tmp/README.md\",\"pages\":\"\"}}" | python3 ./scripts/guard-feflow-skill.py)"
-  printf '%s' "$pretool_read_output" | rg -q '"updatedInput"|Removed an empty `pages` argument' || {
+  printf '%s' "$pretool_read_output" | rg -q '"hookEventName": ?"PreToolUse"|"updatedInput"|Removed an empty `pages` argument' || {
     rm -f "$tmp_transcript"
     echo "pretool hook did not sanitize empty Read pages argument" >&2
     exit 1
@@ -295,7 +297,16 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  stop_init_approval_output="$(printf '%s' "{\"transcript_path\":\"$tmp_init_transcript\",\"last_assistant_message\":\"如果你同意，我就开始初始化。回复：同意，继续\"}" | python3 ./scripts/guard-feflow-stop.py)"
+  printf '%s' "$stop_init_approval_output" | rg -q '"decision": ?"block"|already authorized by the command' || {
+    rm -f "$tmp_init_transcript"
+    rm -f "$tmp_transcript"
+    echo "stop hook did not block extra init approval churn" >&2
+    exit 1
+  }
+
   rm -f "$tmp_transcript"
+  rm -f "$tmp_init_transcript"
 
   if rg -n '按阶段检查预期产出|完整度: 5/8|5/8 \\(62\\.5%\\)' "skills/evidence-chain/SKILL.md"; then
     echo "evidence-chain still contains rigid legacy completeness language" >&2
@@ -491,16 +502,18 @@ else
 
   tmp_transcript="$(mktemp)"
   printf '%s\n' '{"type":"user","message":{"role":"user","content":"<command-name>/feflow:task</command-name>"}}' >"$tmp_transcript"
+  tmp_init_transcript="$(mktemp)"
+  printf '%s\n' '{"type":"user","message":{"role":"user","content":"<command-name>/feflow:init</command-name>"}}' >"$tmp_init_transcript"
 
   pretool_skill_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"pua\"}}" | python3 ./scripts/guard-feflow-skill.py)"
-  printf '%s' "$pretool_skill_output" | grep -qE '"permissionDecision": ?"deny"|Do not invoke unrelated external persona/workflow skills' || {
+  printf '%s' "$pretool_skill_output" | grep -qE '"hookEventName": ?"PreToolUse"|"permissionDecision": ?"deny"|Do not invoke unrelated external persona/workflow skills' || {
     rm -f "$tmp_transcript"
     echo "pretool hook did not deny pua skill invocation inside feflow commands" >&2
     exit 1
   }
 
   pretool_read_output="$(printf '%s' "{\"transcript_path\":\"$tmp_transcript\",\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"/tmp/README.md\",\"pages\":\"\"}}" | python3 ./scripts/guard-feflow-skill.py)"
-  printf '%s' "$pretool_read_output" | grep -qE '"updatedInput"|Removed an empty `pages` argument' || {
+  printf '%s' "$pretool_read_output" | grep -qE '"hookEventName": ?"PreToolUse"|"updatedInput"|Removed an empty `pages` argument' || {
     rm -f "$tmp_transcript"
     echo "pretool hook did not sanitize empty Read pages argument" >&2
     exit 1
@@ -518,7 +531,16 @@ else
     exit 1
   }
 
+  stop_init_approval_output="$(printf '%s' "{\"transcript_path\":\"$tmp_init_transcript\",\"last_assistant_message\":\"如果你同意，我就开始初始化。回复：同意，继续\"}" | python3 ./scripts/guard-feflow-stop.py)"
+  printf '%s' "$stop_init_approval_output" | grep -qE '"decision": ?"block"|already authorized by the command' || {
+    rm -f "$tmp_init_transcript"
+    rm -f "$tmp_transcript"
+    echo "stop hook did not block extra init approval churn" >&2
+    exit 1
+  }
+
   rm -f "$tmp_transcript"
+  rm -f "$tmp_init_transcript"
 
   if grep -nE '按阶段检查预期产出|完整度: 5/8|5/8 \(62\.5%\)' "skills/evidence-chain/SKILL.md"; then
     echo "evidence-chain still contains rigid legacy completeness language" >&2

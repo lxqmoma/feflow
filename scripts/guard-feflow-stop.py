@@ -66,6 +66,17 @@ def main() -> int:
         return 0
 
     message = payload.get("last_assistant_message") or ""
+    if mode == "init" and re.search(r"(同意，继续|回复[:：]\s*同意|如果你同意|请确认是否允许我初始化)", message):
+        response = {
+            "decision": "block",
+            "reason": (
+                "For /feflow:init, bounded workspace bootstrap is already authorized by the command. "
+                "Do not ask for an extra approval round unless overwrite, merge, or other non-trivial side effects are real."
+            ),
+        }
+        sys.stdout.write(json.dumps(response, ensure_ascii=False))
+        return 0
+
     if not should_block(message):
         return 0
 
