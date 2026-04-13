@@ -23,9 +23,9 @@ def extract_feflow_command(text: str | None) -> str | None:
 
 
 def state_path_for(payload: dict[str, Any]) -> Path | None:
-    session_id = payload.get("session_id")
     transcript_path = payload.get("transcript_path")
-    raw_key = str(session_id or transcript_path or "").strip()
+    session_id = payload.get("session_id")
+    raw_key = str(transcript_path or session_id or "").strip()
     if not raw_key:
         return None
 
