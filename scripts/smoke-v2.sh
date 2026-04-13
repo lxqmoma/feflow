@@ -213,6 +213,11 @@ if command -v rg >/dev/null 2>&1; then
     exit 1
   }
 
+  if rg -n '\$0|\$1|\$2|\$3' "commands/init.md" "commands/task.md"; then
+    echo "command dispatch contains raw slash-command argument placeholders that can corrupt shell scripts" >&2
+    exit 1
+  fi
+
   rg -q 'post-execution|post-dispatch|future-tense narration|完成态' "runtime/frontend-harness.md" "CLAUDE.md" "V2-ACCEPTANCE-SUITE.md" || {
     echo "post-dispatch visible reply guidance is missing" >&2
     exit 1
@@ -373,6 +378,11 @@ else
     echo "command shell mode is not pinned to bash" >&2
     exit 1
   }
+
+  if grep -nE '\$0|\$1|\$2|\$3' "commands/init.md" "commands/task.md"; then
+    echo "command dispatch contains raw slash-command argument placeholders that can corrupt shell scripts" >&2
+    exit 1
+  fi
 
   grep -qE 'post-execution|post-dispatch|future-tense narration|完成态' "runtime/frontend-harness.md" "CLAUDE.md" "V2-ACCEPTANCE-SUITE.md" || {
     echo "post-dispatch visible reply guidance is missing" >&2

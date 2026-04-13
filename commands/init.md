@@ -88,8 +88,8 @@ created_files=()
 preserved_files=()
 
 write_if_missing() {
-  local target_file="$1"
-  shift
+  local target_file="${1:-}"
+  shift || true
   if [ -e "$target_file" ]; then
     preserved_files+=("$target_file")
     cat >/dev/null

@@ -89,8 +89,8 @@ if [ "$dispatch_mode" = "delivery" ] && [ -n "$trimmed_input" ]; then
       | tr '[:space:]/:_-' '\n' \
       | sed 's/[^[:alnum:]]//g' \
       | sed '/^$/d' \
-      | awk 'length($0) >= 3' \
-      | awk '!seen[tolower($0)]++' \
+      | grep -E '.{3,}' \
+      | sort -fu \
       | sed -n '1,5p' \
       | while read -r token; do
           printf '[%s]\n' "$token"
